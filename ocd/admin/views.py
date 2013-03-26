@@ -5,8 +5,8 @@ from django.shortcuts import render, redirect
 
 import bson.objectid
 
-from ocd.core import db
-from ocd.admin import models
+from ..core import db
+from .models import Person
 from .forms import PersonForm
 
 
@@ -31,7 +31,7 @@ def person(request, _id):
     # Get the person data.
     _id = bson.objectid.ObjectId(_id)
     person = db.people.find_one(_id)
-    person = models.Person(person)
+    person = Person(person)
 
     # Stringify the object id.
     person['_id'] = str(person['_id'])
@@ -44,6 +44,6 @@ def person(request, _id):
 
 def person_list(request):
     context = {}
-    context['people'] = (models.Person(obj) for obj in db.people.find())
+    context['people'] = map(Person, db.people.find())
     return render(request, 'person/list.html', context)
 
