@@ -1,0 +1,40 @@
+
+<form method="POST">
+{% csrf_token %}
+{{ form.as_p }}
+
+{# repeat the alternate_name form n times #}
+{% for _ in 'xxx' %}
+    <p><label for="id_alternate_name_note">Alternate name note {{forloop.counter}}:</label> <select id="id_alternate_name_note" name="alternate_name_note">
+    <option value="" selected="selected"></option>
+    <option value="first">first</option>
+    <option value="last">last</option>
+    <option value="nickname">nickname</option>
+    </select></p>
+    <p><label for="id_alternate_name_name">Alternate name {{forloop.counter}}:</label> <input id="id_alternate_name_name" name="alternate_name_name" type="text" /></p>
+{% endfor %}
+
+{% for _ in 'xxx' %}
+    <p><label for="id_link_url">Link url {{forloop.counter}}:</label> <input id="id_link_url" name="link_url" type="text" /></p>
+    <p><label for="id_link_note">Link note {{forloop.counter}}:</label> <input id="id_link_note" name="link_note" type="text" /></p>
+{% endfor %}
+
+{% for _ in 'xxx' %}
+    <p><label for="id_contact_type">Contact type {{forloop.counter}}:</label> <select id="id_contact_type" name="contact_type">
+    <p><label for="id_contact_note">Contact note {{forloop.counter}}:</label> <input id="id_contact_note" name="contact_note" type="text" /></p>
+    <p><label for="id_contact_value">Contact value {{forloop.counter}}:</label> <input id="id_contact_value" name="contact_value" type="text" /></p>
+    <option value="" selected="selected"></option>
+    <option value="address">address</option>
+    <option value="voice">voice</option>
+    <option value="fax">fax</option>
+    <option value="cell">cell</option>
+    <option value="tollfree">tollfree</option>
+    <option value="video">video</option>
+    <option value="textphone">textphone</option>
+    <option value="email">email</option>
+    </select></p>
+{% endfor %}
+
+
+<input type="submit" value="Submit">
+</form>
