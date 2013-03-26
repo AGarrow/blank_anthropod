@@ -1,3 +1,6 @@
-from django.db import models
 
-# Create your models here.
+
+class Person(dict):
+
+    def id(self):
+        return self['_id']

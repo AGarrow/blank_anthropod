@@ -1,6 +1,4 @@
-import re
 import collections
-from itertools import groupby
 from operator import itemgetter
 
 from django import forms
@@ -18,10 +16,6 @@ GEO_CHOICES = [
     ('ocd:location:country-us:state-nevada:city-reno',
      'City of Reno, NV'),
     ]
-
-
-def _mk_choices(iterable):
-    return zip(iterable, iterable)
 
 
 class PersonForm(forms.Form):
@@ -45,129 +39,30 @@ class PersonForm(forms.Form):
     image = forms.URLField(required=False)
     biography = forms.CharField(widget=forms.Textarea, required=False)
 
-    # # Alternate name fields.
-    # ALT_NAME_TYPE_CHOICES = _mk_choices(['', 'first', 'last', 'nickname'])
-
-    # alternate_name_note_1 = forms.ChoiceField(
-    #     choices=ALT_NAME_TYPE_CHOICES, required=False)
-    # alternate_name_name_1 = forms.CharField(required=False)
-
-    # alternate_name_note_2 = forms.ChoiceField(
-    #     choices=ALT_NAME_TYPE_CHOICES, required=False)
-    # alternate_name_name_2 = forms.CharField(required=False)
-
-    # alternate_name_note_3 = forms.ChoiceField(
-    #     choices=ALT_NAME_TYPE_CHOICES, required=False)
-    # alternate_name_name_3 = forms.CharField(required=False)
-
-    # link_url_1 = forms.CharField(required=False)
-    # link_note_1 = forms.CharField(required=False)
-
-    # link_url_2 = forms.CharField(required=False)
-    # link_note_2 = forms.CharField(required=False)
-
-    # link_url_3 = forms.CharField(required=False)
-    # link_note_3 = forms.CharField(required=False)
-
-    # link_url_4 = forms.CharField(required=False)
-    # link_note_4 = forms.CharField(required=False)
-
-    # link_url_5 = forms.CharField(required=False)
-    # link_note_5 = forms.CharField(required=False)
-
-    # CONTACT_TYPE_CHOICES = _mk_choices([
-    #     '',
-    #     'address',
-    #     'voice',
-    #     'fax',
-    #     'cell',
-    #     'tollfree',
-    #     'video',
-    #     'textphone',
-    #     'email'])
-
-    # # Contact fields with note.
-    # contact_type_1 = forms.ChoiceField(
-    #     choices=CONTACT_TYPE_CHOICES, required=False)
-    # contact_note_1 = forms.CharField(required=False)
-    # contact_value_1 = forms.CharField(required=False)
-
-    # contact_type_2 = forms.ChoiceField(
-    #     choices=CONTACT_TYPE_CHOICES, required=False)
-    # contact_note_2 = forms.CharField(required=False)
-    # contact_value_2 = forms.CharField(required=False)
-
-    # contact_type_3 = forms.ChoiceField(
-    #     choices=CONTACT_TYPE_CHOICES, required=False)
-    # contact_note_3 = forms.CharField(required=False)
-    # contact_value_3 = forms.CharField(required=False)
-
-    # contact_type_4 = forms.ChoiceField(
-    #     choices=CONTACT_TYPE_CHOICES, required=False)
-    # contact_note_4 = forms.CharField(required=False)
-    # contact_value_4 = forms.CharField(required=False)
-
-    # contact_type_5 = forms.ChoiceField(
-    #     choices=CONTACT_TYPE_CHOICES, required=False)
-    # contact_note_5 = forms.CharField(required=False)
-    # contact_value_5 = forms.CharField(required=False)
-
     # Methods for converting this form's data into a popolo person object.
     def _required(self):
         '''Return this form's required fields.
         '''
         return filter(lambda item: item[1].required, self.fields.items())
 
-    def _optional(self):
-        '''Return this form's optional fields.
+    def _get_zipped_field_data(self, request, prefix, fields):
+        '''POST.getlist the values of fields prefixed with `prefix`
+        and zip them together. Generate a stream of dicts.
         '''
-        return filter(lambda item: not item[1].required, self.fields.items())
+        field_names = [prefix + field for field in fields]
+        get = request.POST.getlist
 
-    def _optional_keys(self):
-        '''Return the field names of this form's optional fields.
+        for vals in zip(*map(get, field_names)):
+            # Skip emtpy form values.
+            if any(vals):
+                yield dict(zip(fields, vals))
+
+    def zipfields(self, request, prefix, fields):
+        '''A more convenient wrapper for the previous function.
         '''
-        return map(first, self._optional())
+        return list(self._get_zipped_field_data(request, prefix, fields))
 
-    def _group_fields_by_prefix(self):
-        '''Group the contact_type_1, contact_type_2 field names together.
-        '''
-        rgx = r'(contact|link|alternate_name)'
-        groupable = [(re.match(rgx, key), key) for key in self._optional_keys()]
-        groupable = filter(first, groupable)
-        groupable = [(match.group(), key) for (match, key) in groupable]
-        result = collections.defaultdict(list)
-        for prefix, key in groupable:
-            result[prefix].append(key)
-        return result
-
-    def _group_fields_by_index(self, prefix):
-        '''Yield tuples like:
-            ('contact_type_1', 'contact_note_1', 'contact_value_1')
-            ('contact_type_2', 'contact_note_2', 'contact_value_2')
-            ('contact_type_3', 'contact_note_3', 'contact_value_3')
-            ('contact_type_4', 'contact_note_4', 'contact_value_4')
-            ('contact_type_5', 'contact_note_5', 'contact_value_5')
-        '''
-        keys = self._group_fields_by_prefix()[prefix]
-        search = re.search
-        groupable = [(search('\d+', key), key) for key in keys]
-        groupable = filter(first, groupable)
-        groupable = [(match.group(), key) for (match, key) in groupable]
-        grouped = groupby(groupable, first)
-        for index, keys in grouped:
-            yield tuple(map(second, keys))
-
-    def _tuple_group_to_dict(self, tpl):
-        '''Converts: ('contact_type_5', 'contact_note_5')
-           Into: {'type': somedata1, 'note': somedata2}
-        '''
-        result = {}
-        for fieldname in tpl:
-            key = fieldname.split('_')[-2]
-            result[key] = self.data[fieldname]
-        return result
-
-    def contact(self):
+    def contact(self, request):
         '''Return this form's contact data as a popolo array like:
         [
             {
@@ -177,24 +72,24 @@ class PersonForm(forms.Form):
             }
         ]
         '''
-        data = map(
-            self._tuple_group_to_dict,
-            self._group_fields_by_index('contact'))
+        items = self.zipfields(request,
+                               prefix='contact_',
+                               fields=('type', 'field', 'value'))
 
-        result = collections.defaultdict(dict)
-        for item in data:
-            # Skip empty form fields.
-            if not item['type']:
-                continue
-            result[item['note']][item['type']] = item['value']
+        # Group them by popolo type.
+        grouped = collections.defaultdict(dict)
+        for item in items:
+            grouped[item['type']][item['field']] = item['value']
+
+        # Add the popolo type to each dictionary.
+        result = []
+        for type_, data in grouped.items():
+            data['type'] = type_
+            result.append(data)
+
         return result
 
-    def _filterfalse(self, dict_list):
-        '''Return only the dicts in a dict list that have non-false values.
-        '''
-        return list(obj for obj in dict_list if any(obj.values()))
-
-    def alternate_names(self):
+    def alternate_names(self, request):
         '''
         Return this form's alternate names as a popolo array like:
         [
@@ -209,11 +104,11 @@ class PersonForm(forms.Form):
             }
         ]
         '''
-        return self._filterfalse(map(
-            self._tuple_group_to_dict,
-            self._group_fields_by_index('alternate_name')))
+        return self.zipfields(request,
+                              prefix='alternate_name_',
+                              fields=('note', 'name'))
 
-    def links(self):
+    def links(self, request):
         '''Return this form's links as a popolo array like:
         [
             {
@@ -226,11 +121,11 @@ class PersonForm(forms.Form):
             }
         ]
         '''
-        return self._filterfalse(map(
-            self._tuple_group_to_dict,
-            self._group_fields_by_index('link')))
+        return self.zipfields(request,
+                              prefix='link_',
+                              fields=('note', 'url'))
 
-    def as_popolo(self):
+    def as_popolo(self, request):
         '''Return this form's data as a popolo person.
         '''
         person = {}
@@ -239,9 +134,9 @@ class PersonForm(forms.Form):
         for name, field in self._required():
             person[name] = self.data[name]
 
-        person['addresses'] = dict(self.contact())
-        person['other_names'] = self.alternate_names()
-        person['links'] = self.links()
+        person['addresses'] = self.contact(request)
+        person['other_names'] = self.alternate_names(request)
+        person['links'] = self.links(request)
 
         return person
 

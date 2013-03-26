@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Geography Id</th>
+      <th>Position</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for person in people %}
+    <tr>
+      <td><a href="{% url 'person' person.id %}">{{person.name}}</td>
+      <td>{{person.geography_id}}</td>
+      <td>{{person.position}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

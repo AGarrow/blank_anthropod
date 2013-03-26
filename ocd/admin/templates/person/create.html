@@ -1,40 +1,119 @@
+{% extends "base.html" %}
 
+{% block content %}
+<h1>Create a person</h1>
 <form method="POST">
 {% csrf_token %}
-{{ form.as_p }}
+<table>
+  <tbody>
+  {% for field in form %}
+    <tr>
+      <td>{{ field.label }}:</td>
+      <td>
+        {{ field }}
+        {% if field.field.required %}
+          <span style="color: red;">*</span>
+        {% endif %}
+       <span style="color: red;">{{ field.errors }}</span></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
 
 {# repeat the alternate_name form n times #}
-{% for _ in 'xxx' %}
-    <p><label for="id_alternate_name_note">Alternate name note {{forloop.counter}}:</label> <select id="id_alternate_name_note" name="alternate_name_note">
-    <option value="" selected="selected"></option>
-    <option value="first">first</option>
-    <option value="last">last</option>
-    <option value="nickname">nickname</option>
-    </select></p>
-    <p><label for="id_alternate_name_name">Alternate name {{forloop.counter}}:</label> <input id="id_alternate_name_name" name="alternate_name_name" type="text" /></p>
-{% endfor %}
+  <h2><a href="http://dublincore.org/documents/dcmi-terms/#terms-alternative">Alternate Names</a></h2>
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th>Note</th>
+        <th>Name</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+    {% for _ in 'xxx' %}
+      <tr>
+        <td>
+          Alternate name #{{forloop.counter}}:
+        </td>
+        <td>
+          <select id="id_alternate_name_note" name="alternate_name_note">
+            <option value="" selected="selected"></option>
+            <option value="first">first</option>
+            <option value="last">last</option>
+            <option value="nickname">nickname</option>
+          </select>
+        </td>
+        <td>
+          <input id="id_alternate_name_name" name="alternate_name_name" type="text" />
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
 
-{% for _ in 'xxx' %}
-    <p><label for="id_link_url">Link url {{forloop.counter}}:</label> <input id="id_link_url" name="link_url" type="text" /></p>
-    <p><label for="id_link_note">Link note {{forloop.counter}}:</label> <input id="id_link_note" name="link_note" type="text" /></p>
-{% endfor %}
+  <h2><a href="http://www.w3.org/TR/rdf-schema/#ch_seealso">External Links</a></h2>
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th>URL</th>
+        <th>Note</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for _ in 'xxx' %}
+      <tr>
+        <td>Link url #{{forloop.counter}}:</td>
+        <td>
+          <input id="id_link_noteurl" name="link_url" type="text" />
+        </td>
+        <td>
+          <input id="id_link_note" name="link_note" type="text" />
+        </td>
+      </td>
+    {% endfor %}
+    </tbody>
+  </table>
 
-{% for _ in 'xxx' %}
-    <p><label for="id_contact_type">Contact type {{forloop.counter}}:</label> <select id="id_contact_type" name="contact_type">
-    <p><label for="id_contact_note">Contact note {{forloop.counter}}:</label> <input id="id_contact_note" name="contact_note" type="text" /></p>
-    <p><label for="id_contact_value">Contact value {{forloop.counter}}:</label> <input id="id_contact_value" name="contact_value" type="text" /></p>
-    <option value="" selected="selected"></option>
-    <option value="address">address</option>
-    <option value="voice">voice</option>
-    <option value="fax">fax</option>
-    <option value="cell">cell</option>
-    <option value="tollfree">tollfree</option>
-    <option value="video">video</option>
-    <option value="textphone">textphone</option>
-    <option value="email">email</option>
-    </select></p>
-{% endfor %}
-
+  <h2><a href="http://popoloproject.com/data.html#Address">Addresses</a></h2>
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th>Field</th>
+        <th>Type</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for _ in 'xxx' %}
+      <tr>
+        <td>Contact field {{forloop.counter}}:</td>
+        <td>
+          <select id="id_contact_field" name="contact_field">
+            <option value="" selected="selected"></option>
+            <option value="address">address</option>
+            <option value="voice">voice</option>
+            <option value="fax">fax</option>
+            <option value="cell">cell</option>
+            <option value="tollfree">tollfree</option>
+            <option value="video">video</option>
+            <option value="textphone">textphone</option>
+            <option value="email">email</option>
+          </select>
+        </td>
+        <td>
+          <input id="id_contact_type" name="contact_type" type="text" />
+        </td>
+        <td>
+          <input id="id_contact_value" name="contact_value" type="text" />
+        </td>
+      </td>
+    {% endfor %}
+    </tbody>
+  </table>
 
 <input type="submit" value="Submit">
 </form>
+{% endblock %}
