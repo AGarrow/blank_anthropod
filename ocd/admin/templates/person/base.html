@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  {% block person_header %}
+    <span class='pull-right'>
+      <a href="/ocd/person/create/">
+        <button type="button" class="btn btn primary">Create new person</button>
+      </a>
+    </span>
+    <h1>
+      <a href="/ocd/person/">People</a>
+      {% block viewname %}{% endblock %}
+    </h1>
+  {% endblock %}
+
+  {% block person_content %}
+  {% endblock %}
+
+{% endblock %}

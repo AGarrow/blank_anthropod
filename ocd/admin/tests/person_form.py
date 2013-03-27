@@ -1,4 +1,3 @@
-
 from django.utils import unittest
 from django.test import Client
 from django.core.urlresolvers import reverse
@@ -11,7 +10,6 @@ import ocd.fixtures.people
 class BaseTestCase(unittest.TestCase):
 
     tearDown = staticmethod(ocd.tests.teardown)
-    maxDiff = None
 
     def setUp(self):
         self.client = Client()

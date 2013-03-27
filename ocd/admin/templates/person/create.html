@@ -1,9 +1,17 @@
-{% extends "base.html" %}
+{% extends "person/base.html" %}
 
-{% block content %}
-<h1>Create a person</h1>
+{% block person_header %}
+  <h1>
+    <a href="/ocd/person/">People</a>
+    &nbsp;/&nbsp;{{action}}
+  </h1>
+{% endblock %}
+
+{% block person_content %}
 <form method="POST">
 {% csrf_token %}
+<input type="hidden" name="_id" value="{{ person.id }}">
+
 <table>
   <tbody>
   {% for field in form %}
@@ -20,7 +28,6 @@
   </tbody>
 </table>
 
-{# repeat the alternate_name form n times #}
   <h2><a href="http://dublincore.org/documents/dcmi-terms/#terms-alternative">Alternate Names</a></h2>
   <table>
     <thead>
@@ -32,23 +39,36 @@
     </thead>
     <tbody>
     </tbody>
-    {% for _ in 'xxx' %}
+    {% if form.is_bound %}
+      {% for name, note in form.alt_names %}
       <tr>
+        <td>Alternate name #{{forloop.counter}}:</td>
         <td>
-          Alternate name #{{forloop.counter}}:
-        </td>
-        <td>
-          <select id="id_alternate_name_note" name="alternate_name_note">
-            <option value="" selected="selected"></option>
-            <option value="first">first</option>
-            <option value="last">last</option>
-            <option value="nickname">nickname</option>
+          <select id="id_alternate_name_type" name="alternate_name_note">
+            {% for val, display in form.fields.alternate_name_note.widget.choices %}
+              <option value="{{val}}" {% if val == note %}selected{% endif %}>{{display}}</option>
+            {% endfor %}
           </select>
         </td>
-        <td>
-          <input id="id_alternate_name_name" name="alternate_name_name" type="text" />
-        </td>
+        <td><input id="id_alternate_name_name" name="alternate_name_name" type="text" value="{{name}}"/></td>
       </tr>
+      {% endfor %}
+    {% endif %}
+    {% for _ in form.REPEAT_ALTERNATE_NAME_FIELDS %}
+    <tr>
+      <td>Alternate name #{{forloop.counter}}:</td>
+      <td>
+        <select id="id_alternate_name_note" name="alternate_name_note">
+          <option value="" selected="selected"></option>
+          <option value="first">first</option>
+          <option value="last">last</option>
+          <option value="nickname">nickname</option>
+        </select>
+      </td>
+      <td>
+        <input id="id_alternate_name_name" name="alternate_name_name" type="text" />
+      </td>
+    </tr>
     {% endfor %}
   </table>
 
@@ -62,16 +82,22 @@
       </tr>
     </thead>
     <tbody>
-    {% for _ in 'xxx' %}
+
+    {% if form.is_bound %}
+      {% for url, link in form.links %}
       <tr>
         <td>Link url #{{forloop.counter}}:</td>
-        <td>
-          <input id="id_link_noteurl" name="link_url" type="text" />
-        </td>
-        <td>
-          <input id="id_link_note" name="link_note" type="text" />
-        </td>
-      </td>
+        <td><input id="id_link_url" name="link_url" type="text" value="{{url}}"/></td>
+        <td><input id="id_link_note" name="link_note" type="text" value="{{link}}"/></td>
+      </tr>
+      {% endfor %}
+    {% endif %}
+    {% for _ in form.REPEAT_LINK_FIELDS %}
+    <tr>
+      <td>Link url #{{forloop.counter}}:</td>
+      <td>{{form.link_url}}</td>
+      <td>{{form.link_note}}</td>
+    </tr>
     {% endfor %}
     </tbody>
   </table>
@@ -81,33 +107,43 @@
     <thead>
       <tr>
         <th></th>
-        <th>Field</th>
         <th>Type</th>
         <th>Value</th>
+        <th>Note</th>
       </tr>
     </thead>
     <tbody>
-    {% for _ in 'xxx' %}
+    {% if form.is_bound %}
+      {% for note, type, value in form.contacts %}
+        <tr>
+          <td>Contact field {{forloop.counter}}:</td>
+          <td>
+            <select id="id_contact_type" name="contact_type">
+              {% for val, display in form.fields.contact_type.widget.choices %}
+                <option value="{{val}}" {% if val == type %}selected{% endif %}>{{display}}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td>
+            <input id="id_contact_value" name="contact_value" type="text" value="{{value}}"/>
+          </td>
+          <td>
+            <input id="id_contact_note" name="contact_note" type="text" value="{{note}}"/>
+          </td>
+        </tr>
+      {% endfor %}
+    {% endif %}
+    {% for _ in form.REPEAT_CONTACT_FIELDS %}
       <tr>
         <td>Contact field {{forloop.counter}}:</td>
         <td>
-          <select id="id_contact_field" name="contact_field">
-            <option value="" selected="selected"></option>
-            <option value="address">address</option>
-            <option value="voice">voice</option>
-            <option value="fax">fax</option>
-            <option value="cell">cell</option>
-            <option value="tollfree">tollfree</option>
-            <option value="video">video</option>
-            <option value="textphone">textphone</option>
-            <option value="email">email</option>
-          </select>
+          {{form.contact_type}}
         </td>
         <td>
-          <input id="id_contact_type" name="contact_type" type="text" />
+          {{form.contact_note}}
         </td>
         <td>
-          <input id="id_contact_value" name="contact_value" type="text" />
+          {{form.contact_value}}
         </td>
       </td>
     {% endfor %}

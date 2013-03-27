@@ -1,20 +1,47 @@
-{% extends "base.html" %}
+{% extends "person/base.html" %}
 
-{% block content %}
-<table class="table">
+{% block extra_head %}
+<style>
+div.nopadding {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.inlineform {
+  display: inline;
+}
+
+</style>
+{% endblock extra_head %}
+
+{% block person_content %}
+<table class="table" id="person-table">
   <thead>
     <tr>
       <th>Name</th>
-      <th>Geography Id</th>
       <th>Position</th>
+      <th>Geography Id</th>
     </tr>
   </thead>
   <tbody>
     {% for person in people %}
     <tr>
-      <td><a href="{% url 'person' person.id %}">{{person.name}}</td>
-      <td>{{person.geography_id}}</td>
+      <td><a href="{% url 'person.detail' _id=person.id %}">{{person.name}}</td>
       <td>{{person.position}}</td>
+      <td>{{person.geography_id}}</td>
+      <td>
+        <form action="{% url 'person.delete' %}" method="POST" class="inlineform pull-right">
+          {% csrf_token %}
+          <input type="hidden" value="{{person.id}}" name="_id"></input>
+          <button type="submit" class="btn">
+            <i class="icon-remove"></i>
+          </button>
+        </form>
+        <span class="pull-right">&nbsp;&nbsp;</span>
+        <a class="btn pull-right" href="{% url 'person.edit' person.id %}">
+          <i class="icon-pencil"></i>
+        </a>
+      </td>
     </tr>
     {% endfor %}
   </tbody>
