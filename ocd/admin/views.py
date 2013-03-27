@@ -22,7 +22,7 @@ class CreatePerson(View):
         if form.is_valid():
             popolo_data = form.as_popolo(request)
             _id = db.people.save(popolo_data)
-            return redirect('person', _id=_id)
+            return redirect('person.detail', _id=_id)
         else:
             return render(request, 'person/create.html', dict(form=form))
 
