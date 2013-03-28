@@ -36,8 +36,9 @@ class PersonForm(forms.Form):
     source_url = forms.URLField()
 
     # Optional fields.
-    gender = forms.ChoiceField(choices=[('f', 'Female'), ('m', 'Male')],
-                               required=False)
+    gender = forms.ChoiceField(
+        choices=[('', ''), ('f', 'Female'), ('m', 'Male')],
+        required=False)
     party = forms.CharField(required=False)
     birth_date = forms.DateField(required=False)
     image = forms.URLField(required=False)
@@ -158,8 +159,9 @@ class PersonForm(forms.Form):
         person = {}
 
         # Add the top-level required fields.
-        for name, field in self.base_fields.items():
-            if field.required:
+        for name, field in self.single_fields():
+            value = self.data[name]
+            if value:
                 person[name] = self.data[name]
 
         person['addresses'] = self.contact(request)
@@ -171,9 +173,13 @@ class PersonForm(forms.Form):
     @classmethod
     def from_popolo(cls, person):
         formdata = {}
-        for name, field in cls.base_fields.items():
-            if field.required:
-                formdata[name] = person[name]
+
+        for name, field in cls.single_fields():
+            if name not in person:
+                continue
+            value = person[name]
+            if value:
+                formdata[name] = value
 
         form = cls(formdata)
         form.contacts = person['addresses']
@@ -189,8 +195,9 @@ class PersonForm(forms.Form):
         form.alt_names = alternate_names
         return form
 
-    def single_fields(self):
-        for name, field in self.base_fields.items():
+    @classmethod
+    def single_fields(cls):
+        for name, field in cls.base_fields.items():
             if not name.startswith(('contact', 'alternate_name', 'link')):
                 yield name, field
 
