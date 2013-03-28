@@ -9,7 +9,7 @@ from django.views.decorators.http import require_POST
 import bson.objectid
 
 from ...core import db
-from ..models import Person as PersonModel
+from ...models import Person as PersonModel
 from ..forms import PersonForm
 
 
@@ -85,6 +85,7 @@ def delete(request):
     return render(request, 'person/confirm_delete.html', context)
 
 
+@require_POST
 def really_delete(request):
     _id = request.POST.get('_id')
     _id = bson.objectid.ObjectId(_id)
