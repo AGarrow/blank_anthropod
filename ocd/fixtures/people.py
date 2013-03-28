@@ -27,10 +27,6 @@ def load():
             "name": "Thommy"
         },
         {
-            "note": "first",
-            "name": "Fool"
-        },
-        {
             "note": "last",
             "name": "O'Neil"
         }
