@@ -1,6 +1,6 @@
 import pymongo
 
-from ocd import settings
+from django.conf import settings
 
 
 class ErrorProxy(object):
