@@ -14,7 +14,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(os.path.dirname(__file__), 'ocd.sqlite3'),
+        'NAME': os.path.join(os.path.dirname(__file__), 'anthropod.sqlite3'),
     }
 }
 
@@ -59,9 +59,9 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'ocd.urls'
+ROOT_URLCONF = 'anthropod.urls'
 
-WSGI_APPLICATION = 'ocd.wsgi.application'
+WSGI_APPLICATION = 'anthropod.wsgi.application'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".

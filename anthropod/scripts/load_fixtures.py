@@ -8,7 +8,7 @@ def main():
     if not fixture_modules:
         print usage
     for fixture_module in fixture_modules:
-        mod_fqname = 'ocd.fixtures.' + fixture_module
+        mod_fqname = 'anthropod.fixtures.' + fixture_module
         mod = __import__(mod_fqname, globals(), locals(), ['object'], -1)
         mod.load()
         print 'loaded fixtures from %r' % mod_fqname

@@ -1,6 +1,6 @@
 import json
 
-from ocd.core import db
+from anthropod.core import db
 
 
 def load():
