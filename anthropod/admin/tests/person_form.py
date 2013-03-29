@@ -43,7 +43,7 @@ class CreatePersonTest(unittest.TestCase):
             ['work', 'voice', '1-234-567-8901'],
             ['home', 'tollfree', '1-800-555-5555'],
             ['Work', 'address', '123 Dupont Circle']],
-        'geography_id': 'anthropod:location:country-us:state-texas:city-plano',
+        'geography_id': 'ocd:location:country-us:state-texas:city-plano',
         'links': [
             {'note': 'Twitter',
              'url': 'http://twitter.com/twneale'},
@@ -74,7 +74,7 @@ class CreatePersonTest(unittest.TestCase):
          ['work', 'home', 'Work']),
 
         ('source_url', 'http://www.thomneale.com'),
-        ('geography_id', 'anthropod:location:country-us:state-texas:city-plano'),
+        ('geography_id', 'ocd:location:country-us:state-texas:city-plano'),
 
         ('link_note', ['Twitter', 'Facebook']),
 
@@ -132,7 +132,7 @@ class EditPersonTest(unittest.TestCase):
             ['work', 'voice', '1-234-567-89o1'],
             ['hom3', 'tollfree', '1-8oo-555-5555'],
             ['Work', 'address', '123 Dupont Circl3']],
-        'geography_id': 'anthropod:location:country-us:state-texas:city-plano',
+        'geography_id': 'ocd:location:country-us:state-texas:city-plano',
         'links': [
             {'note': 'Twitt3r',
              'url': 'http://twitt3r.com/twn3al3'},
@@ -164,7 +164,7 @@ class EditPersonTest(unittest.TestCase):
          ['work', 'hom3', 'Work']),
 
         ('source_url', 'http://www.thomn3al3.com'),
-        ('geography_id', 'anthropod:location:country-us:state-texas:city-plano'),
+        ('geography_id', 'ocd:location:country-us:state-texas:city-plano'),
 
         ('link_note', ['Twitt3r', 'Fac3book']),
 
