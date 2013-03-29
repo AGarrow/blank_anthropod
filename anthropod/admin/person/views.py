@@ -10,7 +10,8 @@ import bson.objectid
 
 from ...core import db
 from ...models import Person as Model
-from ..forms.person import EditForm
+
+from .forms import EditForm
 
 
 class Edit(View):

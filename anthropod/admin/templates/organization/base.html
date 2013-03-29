@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  {% block organization_header %}
+    <span class='pull-right'>
+      <a href="{% url 'organization.create' %}">
+        <button type="button" class="btn btn primary">Create new organization</button>
+      </a>
+    </span>
+    <h1>
+      <a href="{% url 'organization.create' %}">Organizations</a>
+    </h1>
+  {% endblock %}
+
+  {% block organization_content %}
+  {% endblock %}
+
+{% endblock %}

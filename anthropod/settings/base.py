@@ -1,4 +1,7 @@
-import os
+from os.path import abspath, dirname, join
+
+
+PROJECT_ROOT = abspath(join(dirname(__file__), '..'))
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -14,7 +17,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(os.path.dirname(__file__), 'anthropod.sqlite3'),
+        'NAME': join(PROJECT_ROOT, 'anthropod.sqlite3'),
     }
 }
 
@@ -29,7 +32,7 @@ USE_TZ = True
 MEDIA_ROOT = ''
 MEDIA_URL = ''
 
-STATIC_ROOT = os.path.join(os.path.dirname(__file__), '..', 'collected_static')
+STATIC_ROOT = join(PROJECT_ROOT, '..', 'collected_static')
 STATIC_URL = '/media/'
 
 STATICFILES_DIRS = (
