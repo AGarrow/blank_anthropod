@@ -3,26 +3,26 @@ from django.conf.urls import patterns, url
 import anthropod.admin.views.person
 
 
-urlpatterns = patterns('',
+urlpatterns = patterns('^person/',
 
-    url(r'^person/$',
+    url(r'/$',
         anthropod.admin.views.person.listing, name='person.list'),
 
-    url(r'^person/create/$',
+    url(r'create/$',
         anthropod.admin.views.person.Edit.as_view(),
         name='person.create'),
 
-    url(r'^person/edit/(?P<_id>\w+)',
+    url(r'edit/(?P<_id>\w+)',
         anthropod.admin.views.person.Edit.as_view(),
         name='person.edit'),
 
-    url(r'^person/delete/',
+    url(r'delete/',
         anthropod.admin.views.person.delete, name='person.delete'),
 
-    url(r'^person/really_delete/',
+    url(r'really_delete/',
         anthropod.admin.views.person.really_delete,
         name='person.really_delete'),
 
-    url(r'^person/detail/(?P<_id>\w+)/$',
+    url(r'detail/(?P<_id>\w+)/$',
         anthropod.admin.views.person.detail, name='person.detail'),
 )

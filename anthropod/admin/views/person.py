@@ -9,8 +9,8 @@ from django.views.decorators.http import require_POST
 import bson.objectid
 
 from ...core import db
-from ...models import Person as PersonModel
-from ..forms import PersonForm
+from ...models import Person as Model
+from ..forms.person import EditForm
 
 
 class Edit(View):
@@ -20,15 +20,15 @@ class Edit(View):
             _id = bson.objectid.ObjectId(_id)
             person = db.people.find_one(_id)
             context = dict(
-                person=PersonModel(person),
-                form=PersonForm.from_popolo(person),
+                person=Model(person),
+                form=EditForm.from_popolo(person),
                 action='edit')
         else:
-            context = dict(form=PersonForm(), action='create')
+            context = dict(form=EditForm(), action='create')
         return render(request, 'person/create.html', context)
 
     def post(self, request, _id=None):
-        form = PersonForm(request.POST)
+        form = EditForm(request.POST)
         if form.is_valid():
             popolo_data = form.as_popolo(request)
 
@@ -50,7 +50,7 @@ def detail(request, _id):
     # Get the person data.
     _id = bson.objectid.ObjectId(_id)
     person = db.people.find_one(_id)
-    person = PersonModel(person)
+    person = Model(person)
 
     # Stringify the object id.
     person['_id'] = str(person['_id'])
@@ -63,7 +63,7 @@ def detail(request, _id):
 
 def listing(request):
     context = {}
-    context['people'] = map(PersonModel, db.people.find())
+    context['people'] = map(Model, db.people.find())
     return render(request, 'person/list.html', context)
 
 
@@ -80,7 +80,7 @@ def delete(request):
     # Dump the person to json.
     person_json = json.dumps(person, indent=4)
     context = dict(
-        person=PersonModel(person),
+        person=Model(person),
         person_json=person_json)
     return render(request, 'person/confirm_delete.html', context)
 
