@@ -2,5 +2,5 @@ from django.conf.urls import patterns, include, url
 
 
 urlpatterns = patterns('',
-    url(r'^/', include('anthropod.admin.urls')),
+    url(r'^admin/', include('anthropod.admin.urls')),
 )
