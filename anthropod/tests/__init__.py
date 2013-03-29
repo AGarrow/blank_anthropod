@@ -1,5 +1,5 @@
 import pymongo
-from ocd.core import settings, _configure_db
+from anthropod.core import settings, _configure_db
 
 
 settings.MONGO_DATABASE += '_test'
