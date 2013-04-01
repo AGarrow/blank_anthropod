@@ -2,6 +2,8 @@ from operator import itemgetter
 
 from django import forms
 
+from anthropod.core import db
+
 
 first = itemgetter(0)
 second = itemgetter(1)
@@ -13,8 +15,7 @@ GEO_CHOICES = [
     ('ocd:location:country-us:state-idaho:city-boise',
      'City of Boise, ID'),
     ('ocd:location:country-us:state-nevada:city-reno',
-     'City of Reno, NV'),
-    ]
+     'City of Reno, NV')]
 
 
 def _mk_choices(iterable):
@@ -29,6 +30,7 @@ class EditForm(forms.Form):
     See: https://github.com/opencivicdata/opencivicdata/wiki/
     '''
     # Required fields.
+    organization = forms.ChoiceField(choices=[])
     name = forms.CharField()
     geography_id = forms.ChoiceField(choices=GEO_CHOICES)
     position = forms.CharField()
@@ -105,15 +107,12 @@ class EditForm(forms.Form):
         return list(data)
 
     def contact(self, request):
-        '''Return this form's contact data as a popolo array like:
-        [
-            ["office", "voice" "+1-800-555-0100;ext=555"],
-            ["home", "fax", "+1-800-555-0199"]
-        ]
+        '''Return this form's contact data as a list of
+        (type, value, note) 3-tuples like ('voice', '12344567', 'home').
         '''
         return self.zipfields(request,
                               prefix='contact_',
-                              fields=('note', 'type', 'value'),
+                              fields=('type', 'value', 'note'),
                               asdict=False)
 
     def alternate_names(self, request):
@@ -201,7 +200,18 @@ class EditForm(forms.Form):
                 yield name, field
 
 
+def getform():
+    '''This will have the same problem of hitting mongo
+    for the contents of the dropdown list.
+    '''
+    ORG_CHOICES = [('', '')]
+    for org in db.organizations.find():
+        ORG_CHOICES.append((org['_id'], org['name']))
 
+    attrs = dict(
+        organization=forms.ChoiceField(choices=ORG_CHOICES),
+        geography_id=forms.ChoiceField(choices=GEO_CHOICES))
 
+    cls = type('EditForm', (EditForm,), attrs)
 
-
+    return cls

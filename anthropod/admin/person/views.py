@@ -11,7 +11,7 @@ import bson.objectid
 from ...core import db
 from ...models import Person as Model
 
-from .forms import EditForm
+from .forms import getform
 
 
 class Edit(View):
@@ -22,14 +22,14 @@ class Edit(View):
             person = db.people.find_one(_id)
             context = dict(
                 person=Model(person),
-                form=EditForm.from_popolo(person),
+                form=getform().from_popolo(person),
                 action='edit')
         else:
-            context = dict(form=EditForm(), action='create')
+            context = dict(form=getform(), action='create')
         return render(request, 'person/create.html', context)
 
     def post(self, request, _id=None):
-        form = EditForm(request.POST)
+        form = getform()(request.POST)
         if form.is_valid():
             popolo_data = form.as_popolo(request)
 
