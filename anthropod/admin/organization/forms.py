@@ -13,8 +13,7 @@ GEO_CHOICES = [
     ('ocd:location:country-us:state-idaho:city-boise',
      'City of Boise, ID'),
     ('ocd:location:country-us:state-nevada:city-reno',
-     'City of Reno, NV'),
-    ]
+     'City of Reno, NV')]
 
 
 def _mk_choices(iterable):
@@ -39,8 +38,7 @@ class EditForm(forms.Form):
         obj = {}
 
         # Add the top-level required fields.
-        for field in self:
-            name = field.name
+        for name, field in self.base_fields.items():
             value = self.data[name]
             if value:
                 obj[name] = self.data[name]
@@ -51,8 +49,7 @@ class EditForm(forms.Form):
     def from_popolo(cls, obj):
         formdata = {}
 
-        for field in cls:
-            name = field.name
+        for name, field in cls.base_fields.items():
             if name not in obj:
                 continue
             value = obj[name]

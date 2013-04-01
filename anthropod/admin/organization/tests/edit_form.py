@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 
 import anthropod.core
 import anthropod.tests
-import anthropod.organization.fixtures
+from ..fixtures import load as load_fixtures
 
 
 class CreateObjTest(unittest.TestCase):
@@ -61,7 +61,7 @@ class EditTest(unittest.TestCase):
     def setUp(self):
         self.client = Client()
         self.db = anthropod.core.db
-        anthropod.organization.fixtures.load()
+        load_fixtures()
 
     def test_form(self):
         '''Submit the organization form with valid data. Ensure that
@@ -69,17 +69,17 @@ class EditTest(unittest.TestCase):
         in the expected way, here mangling the lettering of the values.
         '''
 
-        # Get the Thom fixture.
-        thom = self.db.organizations.find_one(dict(position='Nerd'))
+        # Get the fixture.
+        obj = self.db.organizations.find_one(dict(name='Boise City Council'))
 
         # Construct its edit url.
-        url = reverse('organization.edit', args=(str(thom['_id']),))
+        url = reverse('organization.edit', args=(str(obj['_id']),))
 
         # Post the edited params.
         resp = self.client.post(url, dict(self.params))
 
         # A successful post and form validation should
-        # trigger a redirect to Thom's detail page.
+        # trigger a redirect to ibj's detail page.
         self.assertEquals(resp.status_code, 302)
 
         # Now verify that the saved popolo object
@@ -91,11 +91,11 @@ class EditTest(unittest.TestCase):
     expected = {
         'name': 'C1ty C0unc1l',
         'geography_id': 'ocd:location:country-us:state-idaho:city-boise',
-        'source_url': 'http://m@y0r.c1ty0fb01se.org/c1ty-c0unc1l/'
+        'source_url': 'http://may0r.c1ty0fb01se.org/c1ty-c0unc1l/'
     }
 
     params = [
         ('name', 'C1ty C0unc1l'),
         ('geography_id', 'ocd:location:country-us:state-idaho:city-boise'),
-        ('source_url', 'http://m@y0r.c1ty0fb01se.org/c1ty-c0unc1l/'),
+        ('source_url', 'http://may0r.c1ty0fb01se.org/c1ty-c0unc1l/'),
     ]
