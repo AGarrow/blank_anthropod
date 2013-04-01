@@ -18,7 +18,7 @@ class Edit(View):
     def get(self, request, _id=None):
         if _id is not None:
             _id = bson.objectid.ObjectId(_id)
-            obj = db.organization.find_one(_id)
+            obj = db.organizations.find_one(_id)
             context = dict(
                 obj=Model(obj),
                 form=EditForm.from_popolo(obj),
@@ -38,7 +38,7 @@ class Edit(View):
                 _id = bson.objectid.ObjectId(_id)
                 popolo_data['_id'] = _id
 
-            _id = db.organization.save(popolo_data)
+            _id = db.organizations.save(popolo_data)
             message = 'Successfully, created new organization named %(name)s.'
             messages.info(request, message % popolo_data)
             return redirect('obj.detail', _id=_id)
@@ -49,7 +49,7 @@ class Edit(View):
 def detail(request, _id):
     # Get the obj data.
     _id = bson.objectid.ObjectId(_id)
-    obj = db.organization.find_one(_id)
+    obj = db.organizations.find_one(_id)
     obj = Model(obj)
 
     # Stringify the object id.
@@ -63,7 +63,7 @@ def detail(request, _id):
 
 def listing(request):
     context = {}
-    context['organizations'] = map(Model, db.people.find())
+    context['organizations'] = map(Model, db.organizations.find())
     return render(request, 'organization/list.html', context)
 
 
@@ -72,7 +72,7 @@ def delete(request):
     '''Confirm delete.'''
     _id = request.POST.get('_id')
     _id = bson.objectid.ObjectId(_id)
-    obj = db.people.find_one(_id)
+    obj = db.organizations.find_one(_id)
 
     # Stringify the object id.
     obj['_id'] = str(obj['_id'])
@@ -89,8 +89,8 @@ def delete(request):
 def really_delete(request):
     _id = request.POST.get('_id')
     _id = bson.objectid.ObjectId(_id)
-    obj = db.people.find_one(_id)
-    db.people.remove(_id)
+    obj = db.organizations.find_one(_id)
+    db.organizations.remove(_id)
     message = 'Deleted obj %r with id %r.'
     messages.info(request, message % (obj['name'], _id))
-    return redirect(reverse('obj.list'))
+    return redirect(reverse('organization.list'))
