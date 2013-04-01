@@ -5,7 +5,12 @@ from anthropod.core import db
 
 def load():
 
-    db.people.insert(json.loads('''
+    orgs = db.organizations.find()
+    if orgs.count() == 0:
+        raise Exception('The organization fixtures need to be loaded before '
+                        'the person fixtures.')
+
+    person = json.loads('''
     {
     "addresses": [
         ["voice", "1-234-567-8901", "work"],
@@ -36,4 +41,8 @@ def load():
     "geography_id": "ocd:location:country-us:state-texas:city-plano",
     "position": "Nerd",
     "name": "Thom Neale"
-    }'''))
+    }''')
+
+    org = next(orgs)
+    person['organization_id'] = org['_id']
+    db.people.insert(person)

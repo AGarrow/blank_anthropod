@@ -1,5 +1,6 @@
 from operator import itemgetter
 
+from bson.objectid import ObjectId
 from django import forms
 
 from anthropod.core import db
@@ -30,7 +31,7 @@ class EditForm(forms.Form):
     See: https://github.com/opencivicdata/opencivicdata/wiki/
     '''
     # Required fields.
-    organization = forms.ChoiceField(choices=[])
+    organization_id = forms.ChoiceField(choices=[])
     name = forms.CharField()
     geography_id = forms.ChoiceField(choices=GEO_CHOICES)
     position = forms.CharField()
@@ -166,6 +167,8 @@ class EditForm(forms.Form):
         person['other_names'] = self.alternate_names(request)
         person['links'] = self.links(request)
 
+        person['organization_id'] = ObjectId(person['organization_id'])
+
         return person
 
     @classmethod
@@ -209,7 +212,7 @@ def getform():
         ORG_CHOICES.append((org['_id'], org['name']))
 
     attrs = dict(
-        organization=forms.ChoiceField(choices=ORG_CHOICES),
+        organization_id=forms.ChoiceField(choices=ORG_CHOICES),
         geography_id=forms.ChoiceField(choices=GEO_CHOICES))
 
     cls = type('EditForm', (EditForm,), attrs)

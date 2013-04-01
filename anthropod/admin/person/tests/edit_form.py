@@ -32,8 +32,8 @@ class CreatePersonTest(unittest.TestCase):
         org = db.organizations.find_one()
 
         # Keep the org id as a string for convenience.
-        self.params += [('organization', str(org['_id']))]
-        self.expected['organization'] = str(org['_id'])
+        self.params += [('organization_id', str(org['_id']))]
+        self.expected['organization_id'] = org['_id']
 
         resp = self.client.post(url, dict(self.params))
 
@@ -68,7 +68,6 @@ class CreatePersonTest(unittest.TestCase):
         u'source_url': u'http://www.thomneale.com'}
 
     params = [
-        (u'organization', u'someorg'),
         (u'alternate_name_name',
          [u'Thommy', u'Fool', "O'Neil"]),
 
@@ -127,8 +126,8 @@ class EditPersonTest(unittest.TestCase):
         url = reverse('person.edit', args=(str(thom['_id']),))
 
         # Keep the org id as a string for convenience.
-        self.params += [('organization', str(org['_id']))]
-        self.expected['organization'] = str(org['_id'])
+        self.params += [('organization_id', str(org['_id']))]
+        self.expected['organization_id'] = org['_id']
 
         # Post the edited params.
         resp = self.client.post(url, dict(self.params))
