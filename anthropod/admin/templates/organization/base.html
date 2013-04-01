@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 
+{% block person_header %}
+  <h1>
+    <a href="/ocd/organization/">Organizations</a>
+    &nbsp;/&nbsp;{{action}}
+  </h1>
+{% endblock %}
+
 {% block content %}
 
   {% block organization_header %}

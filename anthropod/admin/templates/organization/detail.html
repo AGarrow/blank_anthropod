@@ -1,25 +1,27 @@
-{% extends "person/base.html" %}
+{% extends "organization/base.html" %}
 {% block viewname %}&nbsp;/&nbsp;detail{% endblock %}
-{% block person_content %}
-<h2>name: {{person.name}}</h2>
+{% block organization_content %}
 
-  <form action="{% url 'person.edit' person.id %}" method="GET">
+
+<h2>name: {{obj.name}}</h2>
+
+  <form action="{% url 'organization.edit' _id=obj.id %}" method="GET">
     {% csrf_token %}
     <button type="submit" class="btn btn-primary">
-      <i class="icon-pencil"></i> Edit this person
+      <i class="icon-pencil"></i> Edit this organization
     </button>
   </form>
 
-  <form action="{% url 'person.delete' %}" method="POST">
+  <form action="{% url 'organization.delete' %}" method="POST">
     {% csrf_token %}
-    <input type="hidden" value="{{person.id}}" name="_id"></input>
+    <input type="hidden" value="{{obj.id}}" name="_id"></input>
     <button type="submit" class="btn btn-danger">
-      <i class="icon-remove"></i> Delete this person
+      <i class="icon-remove"></i> Delete this organization
     </button>
   </form>
 
 <pre>
-    {{person_json}}
+    {{obj_json}}
 </pre>
 
 {% endblock %}

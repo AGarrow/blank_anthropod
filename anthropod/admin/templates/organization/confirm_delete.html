@@ -1,18 +1,18 @@
-{% extends "person/base.html" %}
+{% extends "organization/base.html" %}
 {% block viewname %}&nbsp;/&nbsp;confirm delete{% endblock %}
-{% block person_content %}
-<h2>name: {{person.name}}</h2>
+{% block organization_content %}
+<h2>name: {{obj.name}}</h2>
 
-  <form action="{% url 'person.really_delete' %}" method="POST">
+  <form action="{% url 'organization.really_delete' %}" method="POST">
     {% csrf_token %}
-    <input type="hidden" value="{{person.id}}" name="_id"></input>
+    <input type="hidden" value="{{obj.id}}" name="_id"></input>
     <button type="submit" class="btn btn-danger">
-      <i class="icon-remove"></i> Really delete this person?
+      <i class="icon-remove"></i> Really delete this organization?
     </button>
   </form>
 
   <pre>
-      {{person_json}}
+      {{obj_json}}
   </pre>
 
 {% endblock %}
