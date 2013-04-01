@@ -1,0 +1,19 @@
+{% extends "organization/base.html" %}
+
+{% block organization_header %}
+  <h1>
+    <a href="{% url 'organization.list' %}">Organization</a>
+    &nbsp;/&nbsp;{{action}}
+  </h1>
+{% endblock %}
+
+{% block organization_content %}
+<form method="POST">
+{% csrf_token %}
+<input type="hidden" name="_id" value="{{ organization.id }}">
+{{ form.as_table }}
+
+</br>
+<input type="submit" value="Submit">
+</form>
+{% endblock %}

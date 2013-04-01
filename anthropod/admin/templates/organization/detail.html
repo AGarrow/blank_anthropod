@@ -5,7 +5,7 @@
 
 <h2>name: {{obj.name}}</h2>
 
-  <form action="{% url 'organization.edit' _id=obj.id %}" method="GET">
+  <form action="{% url 'organization.edit' _id=obj.id_string %}" method="GET">
     {% csrf_token %}
     <button type="submit" class="btn btn-primary">
       <i class="icon-pencil"></i> Edit this organization
@@ -14,14 +14,14 @@
 
   <form action="{% url 'organization.delete' %}" method="POST">
     {% csrf_token %}
-    <input type="hidden" value="{{obj.id}}" name="_id"></input>
+    <input type="hidden" value="{{obj.id_string}}" name="_id"></input>
     <button type="submit" class="btn btn-danger">
       <i class="icon-remove"></i> Delete this organization
     </button>
   </form>
 
 <pre>
-    {{obj_json}}
+    {{obj.pretty_print}}
 </pre>
 
 {% endblock %}

@@ -29,6 +29,7 @@ div.nopadding {
     <tr>
       <th>Name</th>
       <th>Position</th>
+      <th>Organization</th>
       <th>Geography Id</th>
     </tr>
   </thead>
@@ -37,6 +38,7 @@ div.nopadding {
     <tr>
       <td><a href="{% url 'person.detail' _id=person.id %}">{{person.name}}</td>
       <td>{{person.position}}</td>
+      <td>{{person.organization.name}}</td>
       <td>{{person.geography_id}}</td>
       <td>
         <form action="{% url 'person.delete' %}" method="POST" class="inlineform pull-right">
