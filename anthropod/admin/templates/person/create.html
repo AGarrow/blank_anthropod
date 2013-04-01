@@ -114,7 +114,7 @@
     </thead>
     <tbody>
     {% if form.is_bound %}
-      {% for note, type, value in form.contacts %}
+      {% for type, value, note in form.contacts %}
         <tr>
           <td>Contact field {{forloop.counter}}:</td>
           <td>
@@ -140,10 +140,10 @@
           {{form.contact_type}}
         </td>
         <td>
-          {{form.contact_note}}
+          {{form.contact_value}}
         </td>
         <td>
-          {{form.contact_value}}
+          {{form.contact_note}}
         </td>
       </td>
     {% endfor %}

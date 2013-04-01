@@ -16,7 +16,7 @@ div.nopadding {
 
 {% block person_header %}
   <span class='pull-right'>
-    <a href="/ocd/person/create/">
+    <a href="{% url 'person.create' %}">
       <button type="button" class="btn btn primary">Create new person</button>
     </a>
   </span>
