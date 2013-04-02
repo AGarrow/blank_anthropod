@@ -8,7 +8,7 @@ import bson.objectid
 
 from ...core import db
 
-from .forms import getform
+from ..forms.person import getform
 
 
 class Edit(View):

@@ -9,7 +9,7 @@ from django.views.decorators.http import require_POST
 import bson.objectid
 
 from ...core import db
-from .forms import EditForm
+from ..forms.organization import EditForm
 
 
 class Edit(View):

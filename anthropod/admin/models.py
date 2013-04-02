@@ -20,3 +20,13 @@ class Person(ModelBase):
 
     def detail_url(self):
         return reverse('person.detail', kwargs=dict(_id=self.id_string))
+
+
+class Organization(ModelBase):
+    collection = db.organizations
+
+    def people(self, extra_spec=None):
+        spec = dict(organization_id=self.id)
+        if extra_spec is not None:
+            spec.update(extra_spec)
+        return db.people.find(spec)
