@@ -15,15 +15,15 @@ To get started:
 
     pip install -r requirements.txt
 
-4. Load the example fixtures.
+4. Load some division ids.
 
-    python anthropod/scripts/load_fixtures.py
+    python manage.py loadgeo "https://raw.github.com/opencivicdata/ocd-division-ids/master/identifiers/country-us/state-nc.csv" --settings=anthropod.settings.dev
 
 5. Start the development server.
 
-    python manage.py runserver --settings='anthropod.settings.dev'
+    python manage.py runserver --settings=anthropod.settings.dev
 
-6. View people in the database.
+6. Edit people and organizations.
 
-    http://localhost:8000/admin/person/
+    http://localhost:8000/collect/organization/
 

@@ -1,23 +1,9 @@
 from operator import itemgetter
 
 from django import forms
+from anthropod.core import db
 
-
-first = itemgetter(0)
-second = itemgetter(1)
-
-GEO_CHOICES = [
-    ('', ''),
-    ('ocd:location:country-us:state-texas:city-plano',
-     'City of Plano, TX'),
-    ('ocd:location:country-us:state-idaho:city-boise',
-     'City of Boise, ID'),
-    ('ocd:location:country-us:state-nevada:city-reno',
-     'City of Reno, NV')]
-
-
-def _mk_choices(iterable):
-    return zip(iterable, iterable)
+GEO_CHOICES = [('', '')] + [(div['_id'], div['name']) for div in db.divisions.find()]
 
 
 class EditForm(forms.Form):
