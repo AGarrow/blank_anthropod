@@ -49,3 +49,4 @@ _configure_db(settings.MONGO_HOST,
 
 
 from .models import *
+from .collect.models import *
