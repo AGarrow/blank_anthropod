@@ -9,15 +9,6 @@ from anthropod.core import db
 first = itemgetter(0)
 second = itemgetter(1)
 
-GEO_CHOICES = [
-    ('', ''),
-    ('ocd:location:country-us:state-texas:city-plano',
-     'City of Plano, TX'),
-    ('ocd:location:country-us:state-idaho:city-boise',
-     'City of Boise, ID'),
-    ('ocd:location:country-us:state-nevada:city-reno',
-     'City of Reno, NV')]
-
 
 def _mk_choices(iterable):
     return zip(iterable, iterable)
@@ -33,7 +24,6 @@ class EditForm(forms.Form):
     # Required fields.
     organization_id = forms.ChoiceField(choices=[])
     name = forms.CharField()
-    geography_id = forms.ChoiceField(choices=GEO_CHOICES)
     position = forms.CharField()
     source_url = forms.URLField()
 
@@ -212,8 +202,7 @@ def getform():
         ORG_CHOICES.append((org['_id'], org['name']))
 
     attrs = dict(
-        organization_id=forms.ChoiceField(choices=ORG_CHOICES),
-        geography_id=forms.ChoiceField(choices=GEO_CHOICES))
+        organization_id=forms.ChoiceField(choices=ORG_CHOICES))
 
     cls = type('EditForm', (EditForm,), attrs)
 
