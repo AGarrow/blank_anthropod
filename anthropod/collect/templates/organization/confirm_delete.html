@@ -11,16 +11,16 @@
     </button>
   </form>
 
+  {% if obj.people.count %}
   <div class="alert alert-error">
-    {% if obj.people.count %}
       {{obj.people.count}} people documents are associated with this organization. Delete them as well?
       <ul>
       {% for person in obj.people %}
         <li><a href="{{person.detail_url}}">{{person.display}}</a></li>
       {% endfor %}
     </ul>
-    {% endif %}
   </div>
+  {% endif %}
 
   <pre>
       {{obj.pretty_print}}

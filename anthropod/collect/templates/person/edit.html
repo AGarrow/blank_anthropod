@@ -1,36 +1,8 @@
 {% extends "person/base.html" %}
+{% load staticfiles %}
 
 {% block extra_head %}
-<script>
-$(document).ready(function() {
-
-  /* When the page loads, create a mapping of phrases
-  like 'alternate-name' and 'contact' to row templates. */
-  var row_templates = {};
-  $('.row-template').each(function(){
-    var key = $(this).data('fieldname');
-    row_templates[key] = $(this).html();
-  })
-
-  /* When user clicks the button to add a new row,
-  create a new tr node, append the row template
-  content to it, and append it to the table. */
-  $('.add-another').click(function(){
-    var row = $('<tr></tr>');
-    row.append(row_templates[$(this).data('fieldname')]);
-    row.find('.remove-row').click(function(){
-      $(this).parents('tr').remove();
-    });
-    $(this).find('~table:first tbody').append(row);
-  });
-
-  /* Remove the form row if user clicks the x button. */
-  $('.remove-row').click(function(){
-    $(this).parents('tr').remove();
-  });
-
-});
-</script>
+    <script src="{% static 'js/site/forms.js' %}"></script>
 {% endblock extra_head %}
 
 {% block person_header %}
@@ -61,154 +33,138 @@ $(document).ready(function() {
   </tbody>
 </table>
 
-  <div class="row well">
-    <a class="btn add-another pull-right" data-fieldname='alternate-name'>
-      <i class="icon-plus-sign"></i>
-      Add another
-    </a>
-    <h2>
-      <a href="http://dublincore.org/documents/dcmi-terms/#terms-alternative">Alternate Names</a>
-    </h2>
-    <table class="table formtable" id="alternate-names">
-      <thead>
-        <tr>
-          <th>Note</th>
-          <th>Name</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-      {% if form.is_bound %}
-        {% for name, note in form.alt_names %}
+<hr/>
+
+<div class="row well">
+  <a class="btn add-another pull-right" data-fieldname='alternate-name'>
+    <i class="icon-plus-sign"></i>
+    Add another
+  </a>
+  <h2>
+    <a href="http://dublincore.org/documents/dcmi-terms/#terms-alternative">Alternate Names</a>
+  </h2>
+  <table class="table formtable" id="alternate-names">
+    <thead>
+      <tr>
+        <th>Note</th>
+        <th>Name</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% if form.is_bound %}
+      {% for name, note in form.alt_names %}
+      <tr>
+        <td>
+          <select id="id_alternate_name_type" name="alternate_name_note">
+            {% for val, display in form.fields.alternate_name_note.widget.choices %}
+              <option value="{{val}}" {% if val == note %}selected{% endif %}>{{display}}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td><input id="id_alternate_name_name" name="alternate_name_name" type="text" value="{{name}}"/></td>
+        <td>
+          <a class="btn remove-row">
+            <i class="icon-remove"></i>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    {% endif %}
+      <tr class='row-template' data-fieldname='alternate-name'>
+        <td>
+          <select id="id_alternate_name_note" name="alternate_name_note">
+            <option value="" selected="selected"></option>
+            <option value="first">first</option>
+            <option value="last">last</option>
+            <option value="nickname">nickname</option>
+          </select>
+        </td>
+        <td>
+          <input id="id_alternate_name_name" name="alternate_name_name" type="text" />
+        </td>
+        <td>
+          <a class="btn remove-row">
+            <i class="icon-remove"></i>
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="row well">
+  <a class="btn add-another pull-right" data-fieldname='external-link'>
+    <i class="icon-plus-sign"></i>
+    Add another
+  </a>
+  <h2><a href="http://www.w3.org/TR/rdf-schema/#ch_seealso">External Links</a></h2>
+  <table class="table formtable" id="external-links">
+    <thead>
+      <tr>
+        <th>URL</th>
+        <th>Note</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% if form.is_bound %}
+      {% for url, link in form.links %}
+      <tr>
+        <td><input id="id_link_url" name="link_url" type="text" value="{{url}}"/></td>
+        <td><input id="id_link_note" name="link_note" type="text" value="{{link}}"/></td>
+        <td>
+          <button class="btn remove-row">
+            <i class="icon-remove"></i>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    {% endif %}
+      <tr class='row-template' data-fieldname='external-link'>
+        <td>{{form.link_url}}</td>
+        <td>{{form.link_note}}</td>
+        <td>
+          <button class="btn remove-row">
+            <i class="icon-remove"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="row well">
+  <a class="btn add-another pull-right" data-fieldname='contact'>
+    <i class="icon-plus-sign"></i>
+    Add another
+  </a>
+  <h2><a href="http://popoloproject.com/data.html#Address">Contact</a></h2>
+  <table class="table formtable" id='contact'>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Value</th>
+        <th>Note</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% if form.is_bound %}
+      {% for type, value, note in form.contacts %}
         <tr>
           <td>
-            <select id="id_alternate_name_type" name="alternate_name_note">
-              {% for val, display in form.fields.alternate_name_note.widget.choices %}
-                <option value="{{val}}" {% if val == note %}selected{% endif %}>{{display}}</option>
+            <select id="id_contact_type" name="contact_type">
+              {% for val, display in form.fields.contact_type.widget.choices %}
+                <option value="{{val}}" {% if val == type %}selected{% endif %}>{{display}}</option>
               {% endfor %}
             </select>
           </td>
-          <td><input id="id_alternate_name_name" name="alternate_name_name" type="text" value="{{name}}"/></td>
           <td>
-            <a class="btn remove-row">
-              <i class="icon-remove"></i>
-            </a>
-          </td>
-        </tr>
-        {% endfor %}
-      {% endif %}
-        <tr class='row-template' data-fieldname='alternate-name'>
-          <td>
-            <select id="id_alternate_name_note" name="alternate_name_note">
-              <option value="" selected="selected"></option>
-              <option value="first">first</option>
-              <option value="last">last</option>
-              <option value="nickname">nickname</option>
-            </select>
+            <input id="id_contact_value" name="contact_value" type="text" value="{{value}}"/>
           </td>
           <td>
-            <input id="id_alternate_name_name" name="alternate_name_name" type="text" />
-          </td>
-          <td>
-            <a class="btn remove-row">
-              <i class="icon-remove"></i>
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="row well">
-    <a class="btn add-another pull-right" data-fieldname='external-link'>
-      <i class="icon-plus-sign"></i>
-      Add another
-    </a>
-    <h2><a href="http://www.w3.org/TR/rdf-schema/#ch_seealso">External Links</a></h2>
-    <table class="table formtable" id="external-links">
-      <thead>
-        <tr>
-          <th>URL</th>
-          <th>Note</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-      {% if form.is_bound %}
-        {% for url, link in form.links %}
-        <tr>
-          <td><input id="id_link_url" name="link_url" type="text" value="{{url}}"/></td>
-          <td><input id="id_link_note" name="link_note" type="text" value="{{link}}"/></td>
-          <td>
-            <button class="btn remove-row">
-              <i class="icon-remove"></i>
-            </button>
-          </td>
-        </tr>
-        {% endfor %}
-      {% endif %}
-        <tr class='row-template' data-fieldname='external-link'>
-          <td>{{form.link_url}}</td>
-          <td>{{form.link_note}}</td>
-          <td>
-            <button class="btn remove-row">
-              <i class="icon-remove"></i>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="row well">
-    <a class="btn add-another pull-right" data-fieldname='contact'>
-      <i class="icon-plus-sign"></i>
-      Add another
-    </a>
-    <h2><a href="http://popoloproject.com/data.html#Address">Contact</a></h2>
-    <table class="table formtable" id='contact'>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Value</th>
-          <th>Note</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-      {% if form.is_bound %}
-        {% for type, value, note in form.contacts %}
-          <tr>
-            <td>
-              <select id="id_contact_type" name="contact_type">
-                {% for val, display in form.fields.contact_type.widget.choices %}
-                  <option value="{{val}}" {% if val == type %}selected{% endif %}>{{display}}</option>
-                {% endfor %}
-              </select>
-            </td>
-            <td>
-              <input id="id_contact_value" name="contact_value" type="text" value="{{value}}"/>
-            </td>
-            <td>
-              <input id="id_contact_note" name="contact_note" type="text" value="{{note}}"/>
-            </td>
-            <td>
-              <button class="btn remove-row">
-                <i class="icon-remove"></i>
-              </button>
-            </td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-        <tr class='row-template' data-fieldname='contact'>
-          <td>
-            {{form.contact_type}}
-          </td>
-          <td>
-            {{form.contact_value}}
-          </td>
-          <td>
-            {{form.contact_note}}
+            <input id="id_contact_note" name="contact_note" type="text" value="{{note}}"/>
           </td>
           <td>
             <button class="btn remove-row">
@@ -216,9 +172,27 @@ $(document).ready(function() {
             </button>
           </td>
         </tr>
-      </tbody>
-    </table>
-  </div>
+      {% endfor %}
+    {% endif %}
+      <tr class='row-template' data-fieldname='contact'>
+        <td>
+          {{form.contact_type}}
+        </td>
+        <td>
+          {{form.contact_value}}
+        </td>
+        <td>
+          {{form.contact_note}}
+        </td>
+        <td>
+          <button class="btn remove-row">
+            <i class="icon-remove"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 <input type="submit" value="Submit">
 </form>

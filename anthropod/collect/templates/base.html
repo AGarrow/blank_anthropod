@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="{% static 'css/site.css' %}">
     <script src="{% static 'js/jquery-1.9.1.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/site.js' %}"></script>
+    <script src="{% static 'js/jquery.hotkeys.min.js' %}"></script>
+    <script src="{% static 'js/site/main.js' %}"></script>
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -48,9 +49,11 @@
       <!--messages -->
       {% if messages %}
       <div class="alert alert-info">
+        <ul class="inline">
         {% for message in messages %}
           <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
         {% endfor %}
+      </ul>
       </div>
       {% endif %}
 
