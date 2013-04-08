@@ -33,12 +33,14 @@ class Edit(View):
             # If this request is editing an existing person,
             # add the id to the popolo data.
             if _id is not None:
+                msg = 'Successfully updated new person named %(name)s.'
                 _id = bson.objectid.ObjectId(_id)
                 popolo_data['_id'] = _id
+            else:
+                msg = 'Successfully created new person named %(name)s.'
 
             _id = db.people.save(popolo_data)
-            message = 'Successfully, created new person named %(name)s.'
-            messages.info(request, message % popolo_data)
+            messages.info(request, msg % popolo_data)
             return redirect('person.detail', _id=_id)
         else:
             return render(request, 'person/edit.html', dict(form=form))
@@ -74,6 +76,6 @@ def really_delete(request):
     _id = bson.objectid.ObjectId(_id)
     person = db.people.find_one(_id)
     db.people.remove(_id)
-    message = 'Deleted person %r with id %r.'
-    messages.info(request, message % (person['name'], _id))
+    msg = 'Deleted person %r with id %r.'
+    messages.info(request, msg % (person['name'], _id))
     return redirect(reverse('person.list'))
