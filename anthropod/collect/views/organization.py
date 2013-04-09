@@ -77,3 +77,15 @@ def really_delete(request):
     msg = 'Deleted obj %r with id %r.'
     messages.success(request, msg % (obj['name'], _id))
     return redirect(reverse('organization.list'))
+
+
+# @require_POST
+# def remove_person(request, organization_id, person_id):
+#     person_id = bson.objectid.ObjectId(person_id)
+#     person = db.people.find_one(person_id)
+#     del person['organization_id']
+#     db.people.save(person)
+#     msg = 'Suggessfully removed %s from organization.'
+#     messages.success(request, msg % person['name'])
+#     kwargs = dict(_id=organization_id)
+#     return redirect(reverse('organization.detail', kwargs=kwargs))
