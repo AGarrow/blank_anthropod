@@ -24,4 +24,28 @@
     {{obj.pretty_print}}
 </pre>
 
+<hr/>
+
+{% if obj.people.count %}
+<h2>Members</h2>
+<table class="table table-striped">
+  <tbody>
+  {% for person in obj.people %}
+    <tr>
+      <td><a href="{% url 'person.detail' _id=person.id %}">{{person.name}}</td>
+      <td>{{person.position}}</td>
+      <td>{{person.organization.name}}</td>
+      <td>
+        <span class="pull-right">&nbsp;&nbsp;</span>
+        <a class="btn pull-right" href="{% url 'person.edit' person.id %}">
+          <i class="icon-pencil"></i>
+        </a>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+This organization has no members yet.
+{% endif %}
 {% endblock %}
