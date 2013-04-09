@@ -1,11 +1,26 @@
 {% extends "person/base.html" %}
+{% block extra_head %}
+<script>
+$(document).ready(function() {
+  $(document).bind('keydown', 'c', function(){
+    window.location = "{% url 'person.create' %}";
+  });
+  $(document).bind('keydown', 'd', function(){
+    $("#delete").click();
+  });
+  $(document).bind('keydown', 'e', function(){
+    $("#edit").click();
+  });
+});
+</script>
+{% endblock extra_head %}
 {% block viewname %}&nbsp;/&nbsp;detail{% endblock %}
 {% block person_content %}
 <h2>name: {{person.name}}</h2>
 
   <form action="{% url 'person.edit' person.id_string %}" method="GET">
     {% csrf_token %}
-    <button type="submit" class="btn btn-primary">
+    <button type="submit" class="btn btn-primary" id="edit">
       <i class="icon-pencil"></i> Edit this person
     </button>
   </form>
@@ -13,7 +28,7 @@
   <form action="{% url 'person.delete' %}" method="POST">
     {% csrf_token %}
     <input type="hidden" value="{{person.id_string}}" name="_id"></input>
-    <button type="submit" class="btn btn-danger">
+    <button type="submit" class="btn btn-danger" d="delete">
       <i class="icon-remove"></i> Delete this person
     </button>
   </form>

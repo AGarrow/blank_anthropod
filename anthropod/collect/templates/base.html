@@ -22,6 +22,16 @@
       <script src="../assets/js/html5shiv.js"></script>
     <![endif]-->
     </style>
+    <script>
+    $(document).ready(function() {
+      $(document).bind('keydown', 'p', function(){
+        window.location = "{% url 'person.list' %}";
+      });
+      $(document).bind('keydown', 'o', function(){
+        window.location = "{% url 'organization.list' %}";
+      });
+    });
+    </script>
     {% block extra_head %}
     {% endblock %}
 </head>

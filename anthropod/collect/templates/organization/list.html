@@ -12,6 +12,13 @@ div.nopadding {
 }
 
 </style>
+<script>
+$(document).ready(function() {
+  $(document).bind('keydown', 'c', function(){
+    window.location = "{% url 'organization.create' %}";
+  });
+});
+</script>
 {% endblock extra_head %}
 
 {% block organization_header %}

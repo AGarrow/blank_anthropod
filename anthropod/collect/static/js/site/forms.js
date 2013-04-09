@@ -8,6 +8,11 @@ $(document).ready(function() {
     row_templates[key] = $(this).html();
   });
 
+  $(".formtable :input").bind('keydown', 'ctrl+shift', function(){
+    $(this).parents('.well').children('a.add-another').click();
+    $(this).parents('table').find('tr:last :input:first').focus();
+  });
+
   function setup_row_events(){
 
     /* When user clicks the button to add a new row,
