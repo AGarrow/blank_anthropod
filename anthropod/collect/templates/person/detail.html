@@ -5,7 +5,7 @@
 
   <form action="{% url 'person.edit' person.id_string %}" method="GET">
     {% csrf_token %}
-    <button type="submit" class="btn btn-primary">
+    <button type="submit" class="btn btn-primary" id="edit">
       <i class="icon-pencil"></i> Edit this person
     </button>
   </form>
@@ -13,7 +13,7 @@
   <form action="{% url 'person.delete' %}" method="POST">
     {% csrf_token %}
     <input type="hidden" value="{{person.id_string}}" name="_id"></input>
-    <button type="submit" class="btn btn-danger">
+    <button type="submit" class="btn btn-danger" id="delete">
       <i class="icon-remove"></i> Delete this person
     </button>
   </form>

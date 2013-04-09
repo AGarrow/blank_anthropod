@@ -1,8 +1,13 @@
 {% extends "organization/base.html" %}
+{% load staticfiles %}
+
+{% block extra_head %}
+    <script src="{% static 'js/site/forms.js' %}"></script>
+{% endblock extra_head %}
 
 {% block organization_header %}
   <h1>
-    <a href="{% url 'organization.list' %}">Organization</a>
+    <a href="{% url 'organization.list' %}">Organizations</a>
     &nbsp;/&nbsp;{{action}}
   </h1>
 {% endblock %}
@@ -11,9 +16,85 @@
 <form method="POST">
 {% csrf_token %}
 <input type="hidden" name="_id" value="{{ organization.id }}">
-{{ form.as_table }}
 
-</br>
+<table>
+  <tbody>
+  {% for field in form %}
+    <tr>
+      <td>{{ field.label }}:</td>
+      <td>
+        {{ field }}
+        {% if field.field.required %}
+          <span style="color: red;">*</span>
+        {% endif %}
+       <span style="color: red;">{{ field.errors }}</span></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<hr/>
+
+<div class="row well">
+  <a class="btn add-another pull-right" data-fieldname='contact'>
+    <i class="icon-plus-sign"></i>
+    Add another
+  </a>
+  <h2><a href="http://popoloproject.com/data.html#Address">Contact</a></h2>
+  <table class="table formtable" id='contact'>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Value</th>
+        <th>Note</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% if form.is_bound %}
+      {% for type, value, note in form.contacts %}
+        <tr>
+          <td>
+            <select id="id_contact_type" name="contact_type">
+              {% for val, display in form.fields.contact_type.widget.choices %}
+                <option value="{{val}}" {% if val == type %}selected{% endif %}>{{display}}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td>
+            <input id="id_contact_value" name="contact_value" type="text" value="{{value}}"/>
+          </td>
+          <td>
+            <input id="id_contact_note" name="contact_note" type="text" value="{{note}}"/>
+          </td>
+          <td>
+            <button class="btn remove-row">
+              <i class="icon-remove"></i>
+            </button>
+          </td>
+        </tr>
+      {% endfor %}
+    {% endif %}
+      <tr class='row-template' data-fieldname='contact'>
+        <td>
+          {{form.contact_type}}
+        </td>
+        <td>
+          {{form.contact_value}}
+        </td>
+        <td>
+          {{form.contact_note}}
+        </td>
+        <td>
+          <button class="btn remove-row">
+            <i class="icon-remove"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 <input type="submit" value="Submit">
 </form>
 {% endblock %}

@@ -1,5 +1,3 @@
-import json
-
 from django.views.generic.base import View
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
@@ -34,13 +32,15 @@ class Edit(View):
             # If this request is editing an existing obj,
             # add the id to the popolo data.
             if _id is not None:
+                msg = 'Successfully edited organization named %(name)s.'
                 _id = bson.objectid.ObjectId(_id)
                 popolo_data['_id'] = _id
+            else:
+                msg = 'Successfully created new organization named %(name)s.'
 
             _id = db.organizations.save(popolo_data)
-            message = 'Successfully, created new organization named %(name)s.'
-            messages.info(request, message % popolo_data)
-            return redirect('obj.detail', _id=_id)
+            messages.success(request, msg % popolo_data)
+            return redirect('organization.detail', _id=_id)
         else:
             return render(request, 'organization/edit.html', dict(form=form))
 
@@ -74,6 +74,18 @@ def really_delete(request):
     _id = bson.objectid.ObjectId(_id)
     obj = db.organizations.find_one(_id)
     db.organizations.remove(_id)
-    message = 'Deleted obj %r with id %r.'
-    messages.info(request, message % (obj['name'], _id))
+    msg = 'Deleted obj %r with id %r.'
+    messages.success(request, msg % (obj['name'], _id))
     return redirect(reverse('organization.list'))
+
+
+# @require_POST
+# def remove_person(request, organization_id, person_id):
+#     person_id = bson.objectid.ObjectId(person_id)
+#     person = db.people.find_one(person_id)
+#     del person['organization_id']
+#     db.people.save(person)
+#     msg = 'Suggessfully removed %s from organization.'
+#     messages.success(request, msg % person['name'])
+#     kwargs = dict(_id=organization_id)
+#     return redirect(reverse('organization.detail', kwargs=kwargs))

@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns, url
 from .views import person, organization
 
 
@@ -17,5 +17,7 @@ urlpatterns += patterns('anthropod.collect.views.organization',
     url(r'^orgs/delete/$', 'delete', name='organization.delete'),
     url(r'^orgs/really_delete/$', 'really_delete', name='organization.really_delete'),
     url(r'^orgs/detail/(?P<_id>\w+)/$', 'detail', name='organization.detail'),
+    # url(r'^orgs/remove_person/(?P<organization_id>\w+)/(?P<person_id>\w+)/$',
+    #     'remove_person', name='organization.remove_person'),
     url(r'^orgs/$', 'listing', name='organization.list'),
 )
