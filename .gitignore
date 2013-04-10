@@ -2,3 +2,4 @@
 .python_history
 settings_local.py
 collected_static
+anthropod.sqlite3
