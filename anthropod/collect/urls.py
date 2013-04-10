@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-from .views import person, organization
+from .views import person, organization, geo
 
 
 urlpatterns = patterns('anthropod.collect.views.person',
@@ -21,3 +21,10 @@ urlpatterns += patterns('anthropod.collect.views.organization',
     #     'remove_person', name='organization.remove_person'),
     url(r'^orgs/$', 'listing', name='organization.list'),
 )
+
+urlpatterns += patterns('anthropod.collect.views.geo',
+    url(r'^geo/select/$', geo.Select.as_view(), name='geo.select'),
+    url(r'^geo/child_id_jon/(?P<_id>.+)$', 'child_id_json', name='geo.child_id_json'),
+    url(r'^geo/detail/(?P<_id>.+)$', 'detail', name='geo.detail'),
+)
+
