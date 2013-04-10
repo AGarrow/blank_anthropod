@@ -24,7 +24,7 @@ urlpatterns += patterns('anthropod.collect.views.organization',
 
 urlpatterns += patterns('anthropod.collect.views.geo',
     url(r'^geo/select/$', geo.Select.as_view(), name='geo.select'),
-    url(r'^geo/child_id_jon/(?P<_id>.+)$', 'child_id_json', name='geo.child_id_json'),
+    url(r'^geo/child_id_json/(?P<_id>.+)$', 'child_id_json', name='geo.child_id_json'),
     url(r'^geo/detail/(?P<_id>.+)$', 'detail', name='geo.detail'),
 )
 

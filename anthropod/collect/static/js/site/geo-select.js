@@ -12,7 +12,7 @@ $(document).ready(function(){
     $('#inputs').append($(typeahead_templ));
     var input = $("input.typeahead").typeahead({
       name: data.id.replace(/[\/:-]/g, "_"),
-      prefetch: '/collect/geo/ids/'+ data.id,
+      prefetch: '/collect/geo/child_id_json/'+ data.id,
       limit: 10,
       template: [
         '<div>',
