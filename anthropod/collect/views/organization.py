@@ -10,9 +10,13 @@ from ...core import db
 from ..forms.organization import EditForm
 
 
+def create(self):
+    return redirect('geo.select')
+
+
 class Edit(View):
 
-    def get(self, request, _id=None):
+    def get(self, request, geo_id=None, _id=None):
         if _id is not None:
             _id = bson.objectid.ObjectId(_id)
             obj = db.organizations.find_one(_id)
@@ -21,10 +25,11 @@ class Edit(View):
                 form=EditForm.from_popolo(obj),
                 action='edit')
         else:
-            context = dict(form=EditForm(), action='create')
+            form = EditForm(initial=dict(geography_id=geo_id))
+            context = dict(form=form, action='create')
         return render(request, 'organization/edit.html', context)
 
-    def post(self, request, _id=None):
+    def post(self, request, geo_id=None, _id=None):
         form = EditForm(request.POST)
         if form.is_valid():
             popolo_data = form.as_popolo(request)

@@ -20,7 +20,7 @@ class EditForm(HasContactInfo):
     '''
     # Required fields.
     name = forms.CharField()
-    geography_id = forms.ChoiceField(choices=GEO_CHOICES)
+    geography_id = forms.CharField()
     source_url = forms.URLField()
 
     def as_popolo(self, request):

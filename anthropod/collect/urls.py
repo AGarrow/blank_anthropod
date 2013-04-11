@@ -12,7 +12,8 @@ urlpatterns = patterns('anthropod.collect.views.person',
 )
 
 urlpatterns += patterns('anthropod.collect.views.organization',
-    url(r'^orgs/create/$', organization.Edit.as_view(), name='organization.create'),
+    url(r'^orgs/create/$', 'create', name='organization.create'),
+    url(r'^orgs/create_from_place/(?P<geo_id>\S+)$', organization.Edit.as_view(), name='organization.create_from_place'),
     url(r'^orgs/edit/(?P<_id>\w+)/$', organization.Edit.as_view(), name='organization.edit'),
     url(r'^orgs/delete/$', 'delete', name='organization.delete'),
     url(r'^orgs/really_delete/$', 'really_delete', name='organization.really_delete'),

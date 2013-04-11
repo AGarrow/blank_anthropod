@@ -3,6 +3,18 @@
 
 {% block content %}
 
-<h2>Geo Id Detail</h2>
-{{id}}
+  <span class='pull-right'>
+    <a href="{% url 'organization.create_from_place' id %}">
+      <button id="create" type="button" class="btn btn primary">Create new organization</button>
+    </a>
+  </span>
+
+    <h1>Geo Id Detail</h1>
+    <h3 class="muted">{{id}}</h3>
+    {% if organizations.count %}
+        {% include "organization/_table.html" %}
+    {% else %}
+        <p>There are no organizations associated with this place yet.</p>
+    {% endif %}
+
 {% endblock content %}

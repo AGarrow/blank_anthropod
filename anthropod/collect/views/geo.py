@@ -1,4 +1,5 @@
 import json
+import logging
 
 from django.views.generic.base import View
 from django.http import HttpResponse
@@ -6,6 +7,8 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 
 import requests
+
+from anthropod.core import db
 
 
 class Select(View):
@@ -22,6 +25,8 @@ def child_id_json(request, _id):
     '''Return json from locust to power the typeahead widget.
     '''
     url = settings.LOCUST_URL + _id
+    logger = logging.getLogger('locust.client')
+    logger.debug(url)
     locust_response = requests.get(url).json()
     data = []
     for item in locust_response['response']['children']:
@@ -33,5 +38,8 @@ def child_id_json(request, _id):
 
 
 def detail(request, _id):
-    return render(request, 'geo/detail.html', {'id': _id})
+    context = {'id': _id}
+    spec = dict(geography_id=_id)
+    context['organizations'] = db.organizations.find(spec)
+    return render(request, 'geo/detail.html', context)
 

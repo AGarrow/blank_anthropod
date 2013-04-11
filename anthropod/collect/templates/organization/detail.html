@@ -20,20 +20,22 @@ $(document).ready(function() {
 
 <h2>name: {{obj.name}}</h2>
 
-  <form action="{% url 'organization.edit' _id=obj.id_string %}" method="GET">
+<div class="container">
+  <form action="{% url 'organization.edit' _id=obj.id_string %}" method="GET" class="pull-left">
     {% csrf_token %}
     <button type="submit" class="btn btn-primary">
       <i class="icon-pencil"></i> Edit this organization
     </button>
   </form>
 
-  <form action="{% url 'organization.delete' %}" method="POST">
+  <form action="{% url 'organization.delete' %}" method="POST" class="pull-right">
     {% csrf_token %}
     <input type="hidden" value="{{obj.id_string}}" name="_id"></input>
     <button type="submit" class="btn btn-danger" id="delete">
       <i class="icon-remove"></i> Delete this organization
     </button>
   </form>
+</div>
 
 <pre>
     {{obj.pretty_print}}
@@ -43,23 +45,9 @@ $(document).ready(function() {
 
 {% if obj.people.count %}
 <h2>Members</h2>
-<table class="table table-striped">
-  <tbody>
-  {% for person in obj.people %}
-    <tr>
-      <td><a href="{% url 'person.detail' _id=person.id %}">{{person.name}}</td>
-      <td>{{person.position}}</td>
-      <td>{{person.organization.name}}</td>
-      <td>
-        <span class="pull-right">&nbsp;&nbsp;</span>
-        <a class="btn pull-right" href="{% url 'person.edit' person.id %}">
-          <i class="icon-pencil"></i>
-        </a>
-      </td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
+  {% with people=obj.people %}
+    {% include "person/_table.html" %}
+  {% endwith %}
 {% else %}
 This organization has no members yet.
 {% endif %}

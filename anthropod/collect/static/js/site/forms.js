@@ -45,4 +45,7 @@ $(document).ready(function() {
   $(document).bind('row:add', {}, setup_row_events);
   $(document).trigger('row:add');
 
+  // When the page loads, focus in the first real input.
+  $(':input:nth(2)').focus();
+
 });

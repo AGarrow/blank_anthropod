@@ -1,3 +1,7 @@
 .formtable {
     width: auto;
 }
+
+.selected {
+    background-color: #D0F2F5;
+}
