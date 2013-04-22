@@ -5,12 +5,12 @@ $(document).ready(function() {
 
   function down() {
     var tr,
-        selected = $('.selected');
+        selected = table.find('.selected');
     if(selected.length === 0) {
       tr = table.find('tr:first');
       tr.addClass('selected');
     } else {
-      tr = $('.selected');
+      tr = table.find('tr.selected');
       var next_tr = tr.next();
       if(next_tr.length !== 0) {
         tr.removeClass('selected');
@@ -21,12 +21,12 @@ $(document).ready(function() {
 
   function up() {
     var tr,
-        selected = $('.selected');
+        selected = table.find('.selected');
     if(selected.length === 0) {
       tr = table.find('tr:last');
       tr.addClass('selected');
     } else {
-      tr = $('.selected');
+      tr = table.find('tr.selected');
       var next_tr = tr.prev();
       if(next_tr.length !== 0) {
         tr.removeClass('selected');
@@ -34,7 +34,6 @@ $(document).ready(function() {
       }
     }
   }
-
   $(document).bind('keydown', 'j', down);
   $(document).bind('keydown', 'down', down);
   $(document).bind('keydown', 'k', up);

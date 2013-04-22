@@ -26,4 +26,7 @@ div.nopadding {
 
 {% block person_content %}
   {% include "person/_table.html" %}
+  {% with object_list=people %}
+    {% include "_pagination.html" %}
+  {% endwith %}
 {% endblock %}

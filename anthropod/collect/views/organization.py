@@ -4,9 +4,11 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 
-import bson.objectid
+import larvae.organization
 
 from ...core import db
+from ...models.paginators import CursorPaginator
+from ...models.utils import get_id
 from ..forms.organization import EditForm
 
 
@@ -18,7 +20,7 @@ class Edit(View):
 
     def get(self, request, geo_id=None, _id=None):
         if _id is not None:
-            _id = bson.objectid.ObjectId(_id)
+            _id = get_id(_id)
             obj = db.organizations.find_one(_id)
             context = dict(
                 obj=obj,
@@ -32,26 +34,31 @@ class Edit(View):
     def post(self, request, geo_id=None, _id=None):
         form = EditForm(request.POST)
         if form.is_valid():
-            popolo_data = form.as_popolo(request)
+            obj = form.as_popolo(request)
+
+            # Validate the org.
+            obj = larvae.organization.Organization(**obj)
+            obj.validate()
+            obj = obj.as_dict()
 
             # If this request is editing an existing obj,
             # add the id to the popolo data.
             if _id is not None:
                 msg = 'Successfully edited organization named %(name)s.'
-                _id = bson.objectid.ObjectId(_id)
-                popolo_data['_id'] = _id
+                _id = get_id(_id)
+                obj['_id'] = _id
             else:
                 msg = 'Successfully created new organization named %(name)s.'
 
-            _id = db.organizations.save(popolo_data)
-            messages.success(request, msg % popolo_data)
+            _id = db.organizations.save(obj)
+            messages.success(request, msg % obj)
             return redirect('organization.detail', _id=_id)
         else:
             return render(request, 'organization/edit.html', dict(form=form))
 
 
 def detail(request, _id):
-    _id = bson.objectid.ObjectId(_id)
+    _id = get_id(_id)
     obj = db.organizations.find_one(_id)
     context = dict(obj=obj)
     return render(request, 'organization/detail.html', context)
@@ -59,7 +66,9 @@ def detail(request, _id):
 
 def listing(request):
     context = {}
-    context['organizations'] = list(db.organizations.find())
+    page = int(request.GET.get('page', 1))
+    orgs = db.organizations.find()
+    context['organizations'] = CursorPaginator(orgs, page=page, show_per_page=10)
     return render(request, 'organization/list.html', context)
 
 
@@ -67,7 +76,7 @@ def listing(request):
 def delete(request):
     '''Confirm delete.'''
     _id = request.POST.get('_id')
-    _id = bson.objectid.ObjectId(_id)
+    _id = get_id(_id)
     obj = db.organizations.find_one(_id)
     context = dict(obj=obj)
     return render(request, 'organization/confirm_delete.html', context)
@@ -76,7 +85,7 @@ def delete(request):
 @require_POST
 def really_delete(request):
     _id = request.POST.get('_id')
-    _id = bson.objectid.ObjectId(_id)
+    _id = get_id(_id)
     obj = db.organizations.find_one(_id)
     db.organizations.remove(_id)
     msg = 'Deleted obj %r with id %r.'

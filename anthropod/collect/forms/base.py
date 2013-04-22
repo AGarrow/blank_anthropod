@@ -7,12 +7,31 @@ def mk_choices(iterable):
 
 class BaseForm(forms.Form):
 
+    CONTACT_TYPE_CHOICES = mk_choices([
+        '',
+        'address',
+        'voice',
+        'fax',
+        'cell',
+        'tollfree',
+        'video',
+        'textphone',
+        'email'])
+
+    contact_note = forms.CharField(required=False)
+    contact_type = forms.ChoiceField(
+        choices=CONTACT_TYPE_CHOICES, required=False)
+    contact_value = forms.CharField(required=False)
+
+    source_note = forms.CharField(required=False)
+    source_url = forms.CharField(required=False)
+
     def __iter__(self):
         '''When displaying the form with {% for field in form %},
         only display fields that don't begin with "alternate_name",
         "contact", or "link".
         '''
-        skip = ('contact', 'link', 'alternate_name')
+        skip = ('source', 'contact', 'link', 'alternate_name')
         for field in super(BaseForm, self).__iter__():
             if not field.name.startswith(skip):
                 yield field
@@ -20,7 +39,8 @@ class BaseForm(forms.Form):
     @classmethod
     def single_fields(cls):
         for name, field in cls.base_fields.items():
-            if not name.startswith(('contact', 'alternate_name', 'link')):
+            prefixes = ('source', 'contact', 'alternate_name', 'link')
+            if not name.startswith(prefixes):
                 yield name, field
 
     # Methods for converting form data into popolo data.
@@ -45,26 +65,6 @@ class BaseForm(forms.Form):
         data = self._get_zipped_field_data(request, prefix, fields, asdict)
         return list(data)
 
-
-class HasContactInfo(BaseForm):
-    '''A mixin class for adding contact info to a form.
-    '''
-    CONTACT_TYPE_CHOICES = mk_choices([
-        '',
-        'address',
-        'voice',
-        'fax',
-        'cell',
-        'tollfree',
-        'video',
-        'textphone',
-        'email'])
-
-    contact_note = forms.CharField(required=False)
-    contact_type = forms.ChoiceField(
-        choices=CONTACT_TYPE_CHOICES, required=False)
-    contact_value = forms.CharField(required=False)
-
     def contact(self, request):
         '''Return this form's contact data as a list of
         (type, value, note) 3-tuples like ('voice', '12344567', 'home').
@@ -73,3 +73,20 @@ class HasContactInfo(BaseForm):
                               prefix='contact_',
                               fields=('type', 'value', 'note'),
                               asdict=False)
+
+    def sources(self, request):
+        '''Return this form's sources as a popolo array like:
+        [
+            {
+              "url": "http://twitter.com/ev",
+              "note": "Twitter account"
+            },
+            {
+              "url": "http://en.wikipedia.org/wiki/John_Q._Public",
+              "note": "Wikipedia page"
+            }
+        ]
+        '''
+        return self.zipfields(request,
+                              prefix='source_',
+                              fields=('note', 'url'))

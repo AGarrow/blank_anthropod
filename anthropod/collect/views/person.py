@@ -4,18 +4,19 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 
-import bson.objectid
+import larvae.person
 
 from ...core import db
-
 from ..forms.person import getform
+from ...models.paginators import CursorPaginator
+from ...models.utils import get_id
 
 
 class Edit(View):
 
     def get(self, request, _id=None):
         if _id is not None:
-            _id = bson.objectid.ObjectId(_id)
+            _id = get_id(_id)
             person = db.people.find_one(_id)
             context = dict(
                 person=person,
@@ -28,19 +29,24 @@ class Edit(View):
     def post(self, request, _id=None):
         form = getform()(request.POST)
         if form.is_valid():
-            popolo_data = form.as_popolo(request)
+            obj = form.as_popolo(request)
+
+            # Validate the person
+            obj = larvae.person.Person(**obj)
+            obj.validate()
+            obj = obj.as_dict()
 
             # If this request is editing an existing person,
             # add the id to the popolo data.
             if _id is not None:
                 msg = 'Successfully updated new person named %(name)s.'
-                _id = bson.objectid.ObjectId(_id)
-                popolo_data['_id'] = _id
+                _id = get_id(_id)
+                obj['_id'] = _id
             else:
                 msg = 'Successfully created new person named %(name)s.'
 
-            _id = db.people.save(popolo_data)
-            messages.info(request, msg % popolo_data)
+            _id = db.people.save(obj)
+            messages.info(request, msg % obj)
             return redirect('person.detail', _id=_id)
         else:
             return render(request, 'person/edit.html', dict(form=form))
@@ -48,7 +54,7 @@ class Edit(View):
 
 def detail(request, _id):
     # Get the person data.
-    _id = bson.objectid.ObjectId(_id)
+    _id = get_id(_id)
     person = db.people.find_one(_id)
     context = dict(person=person)
     return render(request, 'person/detail.html', context)
@@ -56,7 +62,9 @@ def detail(request, _id):
 
 def listing(request):
     context = {}
-    context['people'] = db.people.find()
+    page = int(request.GET.get('page', 1))
+    people = db.people.find()
+    context['people'] = CursorPaginator(people, page=page, show_per_page=10)
     return render(request, 'person/list.html', context)
 
 
@@ -73,7 +81,7 @@ def delete(request):
 @require_POST
 def really_delete(request):
     _id = request.POST.get('_id')
-    _id = bson.objectid.ObjectId(_id)
+    _id = get_id(_id)
     person = db.people.find_one(_id)
     db.people.remove(_id)
     msg = 'Deleted person %r with id %r.'

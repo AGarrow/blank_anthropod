@@ -34,4 +34,7 @@ $(document).ready(function() {
 
 {% block organization_content %}
   {% include "organization/_table.html" %}
+  {% with object_list=organizations %}
+    {% include "_pagination.html" %}
+  {% endwith %}
 {% endblock %}

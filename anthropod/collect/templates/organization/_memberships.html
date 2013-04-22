@@ -1,0 +1,20 @@
+<table class="table table-keys" id="membership-table">
+  <thead>
+    <tr>
+      <th>Organization</th>
+      <th>Post id</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for memb in obj.memberships %}
+    <tr>
+      <td>
+        <a href={{memb.person.detail_url|safe}}>
+          {{memb.person.display}}</td>
+        </a>
+      </td>
+      <td>{{memb.post_id}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

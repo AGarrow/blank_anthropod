@@ -3,6 +3,7 @@ import json
 from bson.objectid import ObjectId
 
 from anthropod.core import _model_registry, _model_registry_by_collection
+from anthropod.models.utils import get_id
 
 
 class ModelMeta(type):
@@ -36,6 +37,24 @@ class ModelBase(dict):
     def pretty_print(self):
         return json.dumps(self, cls=_PrettyPrintEncoder, indent=4,
                           sort_keys=True)
+
+    @classmethod
+    def find_one(cls, _id):
+        '''Find one; raise DoesNotExist if not found.
+        '''
+        obj = cls.collection.find_one(get_id(_id))
+        if obj is None:
+            msg = 'No orgnization found with id %r.' % _id
+            raise cls.DoesNotExist(msg)
+        return obj
+
+    @classmethod
+    def find(cls, *args, **kwargs):
+        objs = cls.collection.find(*args, **kwargs)
+        if objs is None:
+            msg = 'No orgnizations found for %r.' % ((args, kwargs),)
+            raise cls.DoesNotExist(msg)
+        return objs
 
 
 class _PrettyPrintEncoder(json.JSONEncoder):

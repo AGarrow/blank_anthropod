@@ -1,10 +1,9 @@
 from operator import itemgetter
 
-from bson.objectid import ObjectId
 from django import forms
 
 from anthropod.core import db
-from .base import HasContactInfo
+from .base import BaseForm
 
 
 first = itemgetter(0)
@@ -15,7 +14,7 @@ def _mk_choices(iterable):
     return zip(iterable, iterable)
 
 
-class EditForm(HasContactInfo):
+class EditForm(BaseForm):
     '''Provide a form for manual data collection of the fields
     described on the Manual-data-collection-tool page of the
     open-civic-data wiki.
@@ -23,16 +22,13 @@ class EditForm(HasContactInfo):
     See: https://github.com/opencivicdata/opencivicdata/wiki/
     '''
     # Required fields.
-    organization_id = forms.ChoiceField(choices=[])
     name = forms.CharField()
-    position = forms.CharField()
-    source_url = forms.URLField()
 
     # Optional fields.
     gender = forms.ChoiceField(
         choices=[('', ''), ('f', 'Female'), ('m', 'Male')],
         required=False)
-    party = forms.CharField(required=False)
+    # party = forms.CharField(required=False)
     birth_date = forms.DateField(required=False)
     image = forms.URLField(required=False)
     biography = forms.CharField(widget=forms.Textarea, required=False)
@@ -84,21 +80,20 @@ class EditForm(HasContactInfo):
     def as_popolo(self, request):
         '''Return this form's data as a popolo person.
         '''
-        person = {}
+        obj = {}
 
         # Add the top-level required fields.
         for name, field in self.single_fields():
             value = self.data[name]
             if value:
-                person[name] = self.data[name]
+                obj[name] = self.data[name]
 
-        person['addresses'] = self.contact(request)
-        person['other_names'] = self.alternate_names(request)
-        person['links'] = self.links(request)
+        obj['contact_details'] = self.contact(request)
+        obj['other_names'] = self.alternate_names(request)
+        obj['links'] = self.links(request)
+        obj['sources'] = self.sources(request)
 
-        person['organization_id'] = ObjectId(person['organization_id'])
-
-        return person
+        return obj
 
     @classmethod
     def from_popolo(cls, person):
@@ -112,7 +107,7 @@ class EditForm(HasContactInfo):
                 formdata[name] = value
 
         form = cls(formdata)
-        form.contacts = person['addresses']
+        form.contacts = person.get('contact_details')
 
         links = []
         for link in person['links']:
@@ -123,6 +118,7 @@ class EditForm(HasContactInfo):
         for name in person['other_names']:
             alternate_names.append((name['name'], name['note']))
         form.alt_names = alternate_names
+        form.sources = person.get('sources')
         return form
 
 
@@ -130,13 +126,4 @@ def getform():
     '''This will have the same problem of hitting mongo
     for the contents of the dropdown list.
     '''
-    ORG_CHOICES = [('', '')]
-    for org in db.organizations.find():
-        ORG_CHOICES.append((org['_id'], org['name']))
-
-    attrs = dict(
-        organization_id=forms.ChoiceField(choices=ORG_CHOICES))
-
-    cls = type('EditForm', (EditForm,), attrs)
-
-    return cls
+    return EditForm

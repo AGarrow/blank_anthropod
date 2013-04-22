@@ -4,3 +4,5 @@ settings_local.py
 collected_static
 anthropod.sqlite3
 anthropod/settings/local.py
+dump
+python-larvae

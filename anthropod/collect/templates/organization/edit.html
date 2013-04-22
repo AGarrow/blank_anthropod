@@ -36,6 +36,47 @@
 <hr/>
 
 <div class="row well">
+  <a class="btn add-another pull-right" data-fieldname='sources'>
+    <i class="icon-plus-sign"></i>
+    Add another
+  </a>
+  <h2>Sources</h2>
+  <table class="table formtable" id="sources">
+    <thead>
+      <tr>
+        <th>URL</th>
+        <th>Note</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% if form.is_bound %}
+      {% for obj in form.sources %}
+      <tr>
+        <td><input id="id_source_url" name="source_url" type="text" value="{{obj.url}}"/></td>
+        <td><input id="id_source_note" name="source_note" type="text" value="{{obj.note}}"/></td>
+        <td>
+          <button class="btn remove-row">
+            <i class="icon-remove"></i>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    {% endif %}
+      <tr class='row-template' data-fieldname='external-link'>
+        <td>{{form.source_url}}</td>
+        <td>{{form.source_note}}</td>
+        <td>
+          <button class="btn remove-row">
+            <i class="icon-remove"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="row well">
   <a class="btn add-another pull-right" data-fieldname='contact'>
     <i class="icon-plus-sign"></i>
     Add another
