@@ -6,13 +6,15 @@ $(document).ready(function() {
     $("#create").click();
   });
 
+
   // Press d to delete.
   $(document).bind('keydown', 'd', function(){
-    var el = $("#delete");
+    var el = $('.selected .item-delete');
     if(el.length !== 0) {
-      el.click();
+      el.submit();
     } else {
-     $('.selected .item-delete').submit();
+      el = $("#delete");
+      el.click();
     }
   });
 
@@ -22,7 +24,7 @@ $(document).ready(function() {
     if(el.length !== 0) {
       el.click();
     } else {
-      el = $('.selected').find('.item-edit').click();
+      el = $('.selected .item-edit').click();
       window.location.href = el.attr('href');
     }
   });
@@ -33,8 +35,11 @@ $(document).ready(function() {
   });
 
   $(document).bind('keydown', 'return', function(){
-    var el = $('.selected a').first();
-    window.location.href = el.attr('href');
+    var el = $('.selected a');
+    if(el.length !== 0){
+      el.first();
+      window.location.href = el.attr('href');
+    }
   });
 
   // Show key bindings.

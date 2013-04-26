@@ -15,7 +15,7 @@
       </td>
       <td>{{memb.post_id}}</td>
       <td>
-        <form action="{% url 'person.memb.delete' %}" method="POST" class="inlineform pull-right">
+        <form action="{% url 'person.memb.delete' %}" method="POST" class="inlineform pull-right item-delete">
           {% csrf_token %}
           <input type="hidden" value="{{memb.id}}" name="_id"></input>
           <button type="submit" class="btn">
@@ -23,11 +23,8 @@
           </button>
         </form>
         <span class="pull-right">&nbsp;&nbsp;</span>
-        <form action="{% url 'memb.edit' memb.id %}" method="GET" class="inlineform pull-right">
-          <input type="hidden" value="{{memb.id}}" name="_id"></input>
-          <button type="submit" class="btn item-edit">
-            <i class="icon-edit"></i>
-          </button>
+        <a href="{% url 'memb.edit' memb.id %}" class="btn item-edit pull-right">
+          <i class="icon-edit"></i>
         </form>
       </td>
     </tr>
