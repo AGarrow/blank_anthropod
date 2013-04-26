@@ -24,9 +24,8 @@
         </form>
         <span class="pull-right">&nbsp;&nbsp;</span>
         <form action="{% url 'memb.edit' memb.id %}" method="GET" class="inlineform pull-right">
-          {% csrf_token %}
           <input type="hidden" value="{{memb.id}}" name="_id"></input>
-          <button type="submit" class="btn">
+          <button type="submit" class="btn item-edit">
             <i class="icon-edit"></i>
           </button>
         </form>

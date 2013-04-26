@@ -22,7 +22,7 @@ $(document).ready(function() {
     if(el.length !== 0) {
       el.click();
     } else {
-      el = $('.selected .item-edit').click();
+      el = $('.selected').find('.item-edit').click();
       window.location.href = el.attr('href');
     }
   });

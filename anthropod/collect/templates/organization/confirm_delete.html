@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block viewname %}&nbsp;/&nbsp;confirm delete{% endblock %}
 {% block content %}
-<h2>name: {{obj.name}}</h2>
+<h2>{{obj.name}}</h2>
 
   <form action="{% url 'organization.really_delete' %}" method="POST">
     {% csrf_token %}
