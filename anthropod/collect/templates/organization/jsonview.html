@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block extra_head %}
+<script>
+$(document).ready(function() {
+  $(document).bind('keydown', 'c', function(){
+    window.location = "{% url 'organization.create' %}";
+  });
+  $(document).bind('keydown', 'd', function(){
+    $("#delete").click();
+  });
+  $(document).bind('keydown', 'e', function(){
+    window.location = "{% url 'organization.edit' obj.id %}";
+  });
+});
+</script>
+{% endblock extra_head %}
+{% block viewname %}&nbsp;/&nbsp;detail{% endblock %}
+{% block content %}
+
+
+<div class="container">
+  <h2 class="pull-left">{{obj.name}}</h2>
+  <form action="{% url 'organization.delete' %}" method="POST" class="pull-right">
+    {% csrf_token %}
+    <input type="hidden" value="{{obj.id}}" name="_id"></input>
+    <button type="submit" class="btn btn-danger" id="delete">
+      <i class="icon-remove"></i>
+    </button>
+  </form>
+  <span class="pull-right">&nbsp;</span>
+  <form action="{% url 'organization.edit' _id=obj.id %}" method="GET" class="pull-right">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">
+      <i class="icon-pencil"></i>
+    </button>
+  </form>
+</div>
+
+<div>
+  <ul class="nav nav-pills">
+    <li class="active"><a>json</a></li>
+    <li><a id="memberships" href="{% url 'org.memb.listing' obj.id %}">members</a></li>
+  </ul>
+  <div>
+    <h3>json</h3>
+    <pre>
+        {{obj.pretty_print}}
+    </pre>
+  </div>
+</div>
+
+<hr/>
+{% endblock %}

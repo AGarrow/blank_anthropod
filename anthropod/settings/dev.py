@@ -9,7 +9,7 @@ INTERNAL_IPS = ('127.0.0.1',)
 
 MONGO_HOST = 'localhost'
 MONGO_PORT = 27017
-MONGO_DATABASE = 'ocd'
+MONGO_DATABASE = 'ocd_dryrun'
 
 # Add some extra dev logging.
 LOGGING['formatters']['verbose'] = {

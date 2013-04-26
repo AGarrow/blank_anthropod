@@ -1,7 +1,31 @@
 $(document).ready(function() {
 
-  var table = $("table.table-keys tbody");
+  var table = $("table.table-keys tbody"),
+      trs = table.find("tr");
 
+  // Make table rows clickable.
+  table.on('click', 'tr', function(){
+      var location = $(this).find("a").attr("href");
+      if (location) {
+          window.location.href = location;
+          return false;
+      }
+    });
+
+  trs.on('click', '.btn', function(event){
+    event.stopPropagation();
+  });
+
+  // If javascript is enabled, change cursor to pointer over table rows
+  // and add selected class on hover.
+  trs.css('cursor', 'pointer');
+  trs.hover(function(){
+          $(this).addClass('selected');
+      },
+      function(){
+          $(this).removeClass('selected');
+      }
+  );
 
   function down() {
     var tr,

@@ -30,12 +30,15 @@
   <![endif]-->
   </style>
   <script>
-  $(document).ready(function() {
+  $(document).ready(function(){
     $(document).bind('keydown', 'p', function(){
-      window.location = "{% url 'person.list' %}";
+      window.location = "{% url 'person.listing' %}";
     });
     $(document).bind('keydown', 'o', function(){
       window.location = "{% url 'organization.list' %}";
+    });
+    $(document).bind('keydown', 'g', function(){
+      window.location = "{% url 'geo.select' %}";
     });
   });
   </script>
@@ -51,14 +54,17 @@
           <div class="navbar-inner">
             <div class="container">
               <ul class="nav">
-                <li>
-                  <a href="{% url 'person.list' %}">People</a>
+                <li {% if nav_active == 'person' %}class="active"{% endif %}>
+                  <a href="{% url 'person.listing' %}">People</a>
                 </li>
-                <li>
+                <li {% if nav_active == 'org' %}class="active"{% endif %}>
                   <a href="{% url 'organization.list' %}">Organizations</a>
                 </li>
-                <li>
+                <li {% if nav_active == 'geo' %}class="active"{% endif %}>
                   <a href="{% url 'geo.select' %}">Places</a>
+                </li>
+                <li {% if nav_active == 'memb' %}class="active"{% endif %}>
+                  <a>Memberships</a>
                 </li>
               </ul>
             </div>
@@ -84,4 +90,49 @@
         </div>
       </div>
     </div><!-- /.container -->
+
+<div id="key_bindings" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>General key bindings</h3>
+  </div>
+  <div class="modal-body">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Keys</th>
+          <th>Command</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>q</td><td>clear local storage</td></tr>
+        <tr><td>p</td><td>View people</td></tr>
+        <tr><td>o</td><td>View organizations</td></tr>
+        <tr><td>g</td><td>Select geography</td></tr>
+        <tr><td>esc</td><td>remove focus from form fields</td></tr>
+        <tr><td>j</td><td>down 1 row</td></tr>
+        <tr><td>k</td><td>up 1 row</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-body">
+    <h3>Context-specific key bindings</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Keys</th>
+          <th>Command</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>c</td><td>create new</td></tr>
+        <tr><td>e</td><td>edit</td></tr>
+        <tr><td>d</td><td>delete</td></tr>
+        <tr><td>m</td><td>view memberships</td></tr>
+        <tr><td>v</td><td>view json</td></tr>
+        <tr><td>a</td><td>add membership</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 </html>

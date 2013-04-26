@@ -1,3 +1,5 @@
+import uuid
+
 from bson.objectid import ObjectId, InvalidId
 
 
@@ -9,3 +11,7 @@ def get_id(_id):
         return ObjectId(_id)
     except InvalidId:
         return _id
+
+
+def generate_id(type_):
+    return 'ocd-%s/%s' % (type_, uuid.uuid1())

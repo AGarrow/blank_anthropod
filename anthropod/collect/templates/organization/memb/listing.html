@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra_head %}
+  <script src="{% static 'js/site/table_keys.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2 class="pull-left">{{obj.name}}</h2>
+  <form action="{% url 'organization.delete' %}" method="POST" class="pull-right">
+    {% csrf_token %}
+    <input type="hidden" value="{{obj.id}}" name="_id"></input>
+    <button type="submit" class="btn btn-danger" id="delete">
+      <i class="icon-remove"></i>
+    </button>
+  </form>
+  <span class="pull-right">&nbsp;</span>
+  <form action="{% url 'organization.edit' _id=obj.id %}" method="GET" class="pull-right">
+    <button type="submit" class="btn btn-primary">
+      <i class="icon-pencil"></i>
+    </button>
+  </form>
+</div>
+
+<div>
+  <ul class="nav nav-pills">
+    <li><a id="jsonview" href="{% url 'organization.jsonview' obj.id %}">json</a></li>
+    <li class="active"><a id="membership" href="{% url 'org.memb.listing' obj.id %}">members</a></li>
+  </ul>
+  <div>
+    <form action="{% url 'org.memb.add.person' obj.id %}" method="GET" class="pull-right">
+      <button id="add-memb" type="submit" class="btn">
+        <i class="icon-plus-sign"></i>
+        Add another
+      </button>
+    </form>
+    <h3>memberships</h3>
+    {% include "organization/memb/_table.html" %}
+  </div>
+</div>
+
+<hr/>
+{% endblock %}

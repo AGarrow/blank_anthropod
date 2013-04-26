@@ -17,8 +17,8 @@ class Person(ModelBase):
     def display(self):
         return self['name']
 
-    def detail_url(self):
-        return reverse('person.detail', kwargs=dict(_id=self.id_string))
+    def jsonview_url(self):
+        return reverse('person.jsonview', kwargs=dict(_id=self.id))
 
 
 class Organization(ModelBase):
@@ -45,8 +45,8 @@ class Organization(ModelBase):
     def display(self):
         return self['name']
 
-    def detail_url(self):
-        return reverse('organization.detail', kwargs=dict(_id=self.id_string))
+    def jsonview_url(self):
+        return reverse('organization.jsonview', kwargs=dict(_id=self.id))
 
 
 class Membership(ModelBase):
@@ -57,3 +57,6 @@ class Membership(ModelBase):
 
     def person(self):
         return Person.find_one(self['person_id'])
+
+    def jsonview_url(self):
+        return reverse('memb.jsonview', kwargs=dict(_id=self.id))

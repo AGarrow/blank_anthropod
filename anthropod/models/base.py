@@ -28,23 +28,17 @@ class ModelBase(dict):
         '''
         return self['_id']
 
-    @property
-    def id_string(self):
-        '''Return the object's mongo ID as string.
-        '''
-        return str(self['_id'])
-
     def pretty_print(self):
         return json.dumps(self, cls=_PrettyPrintEncoder, indent=4,
                           sort_keys=True)
 
     @classmethod
-    def find_one(cls, _id):
+    def find_one(cls, *args, **kwargs):
         '''Find one; raise DoesNotExist if not found.
         '''
-        obj = cls.collection.find_one(get_id(_id))
+        obj = cls.collection.find_one(*args, **kwargs)
         if obj is None:
-            msg = 'No orgnization found with id %r.' % _id
+            msg = 'No %s found for %r' % (cls.__name__, (args, kwargs))
             raise cls.DoesNotExist(msg)
         return obj
 

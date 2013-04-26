@@ -7,14 +7,16 @@
 {% endblock extra_head %}
 
 {% block content %}
-<h1>Select a place</h1>
+<span>Step 1 of 2<span>
+<h1>Select a place to search for orgs</h1>
 <div class="container">
   {% comment %}
   Note: the form needs "navbar-form" as a class in order for the
   typeahead plugin to play nicely with bootstrap's styles.
   More info in issue #164: https://github.com/twitter/typeahead.js/issues/164.
   {% endcomment %}
-  <form id="geo-form" class="navbar-form" method="POST" action="{% url 'geo.select' %}">
+  <form id="geo-form" class="navbar-form" method="GET" action="{% url 'person.memb.add.org' %}">
+    <input type="hidden" name="person_id" value="{{person_id}}">
     <div class="row-fluid">
       <div class="span7" id="inputs">
           {% csrf_token %}
@@ -22,8 +24,8 @@
       <div class="span5 well">
         <h3>Instructions</h3>
         <p>
-          Start typing a state, then select it search again for
-          a place located within the state. Then click on the
+          Start typing an org name, then select it. Repeat for
+          as many orgs as you want. Click on the
           enter button to submit.
         </p>
         <input type="hidden" name="id" id="final-id">

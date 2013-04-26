@@ -36,4 +36,30 @@ $(document).ready(function() {
     var el = $('.selected a').first();
     window.location.href = el.attr('href');
   });
+
+  // Show key bindings.
+  $(document).bind('keydown', 'shift+/', function(){
+    $('#key_bindings').modal();
+  });
+
+  // View thing's memberships.
+  $(document).bind('keydown', 'm', function(){
+    window.location.href = $('#memberships').attr('href');
+  });
+
+  // View thing's json.
+  $(document).bind('keydown', 'v', function(){
+    window.location.href = $('#jsonview').attr('href');
+  });
+
+  // View thing's json.
+  $(document).bind('keydown', 'a', function(){
+    $('#add-memb').click();
+  });
+
+  $(document).bind('keydown', 'q', function(){
+    localStorage.clear();
+    console.log('Cleared local storage.');
+    location.reload(true);
+  });
 });

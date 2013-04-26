@@ -89,4 +89,5 @@ class BaseForm(forms.Form):
         '''
         return self.zipfields(request,
                               prefix='source_',
-                              fields=('note', 'url'))
+                              fields=('url', 'note'),
+                              asdict=False)

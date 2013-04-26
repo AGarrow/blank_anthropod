@@ -1,0 +1,37 @@
+<table class="table table-keys" id="person-table">
+  <thead>
+    <tr>
+      <th>Organization</th>
+      <th>Post id</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for memb in person.memberships %}
+    <tr>
+      <td>
+        <a href="{% url 'memb.jsonview' memb.id %}">
+          {{memb.organization.display}}
+        </a>
+      </td>
+      <td>{{memb.post_id}}</td>
+      <td>
+        <form action="{% url 'person.memb.delete' %}" method="POST" class="inlineform pull-right">
+          {% csrf_token %}
+          <input type="hidden" value="{{memb.id}}" name="_id"></input>
+          <button type="submit" class="btn">
+            <i class="icon-remove"></i>
+          </button>
+        </form>
+        <span class="pull-right">&nbsp;&nbsp;</span>
+        <form action="{% url 'memb.edit' memb.id %}" method="GET" class="inlineform pull-right">
+          {% csrf_token %}
+          <input type="hidden" value="{{memb.id}}" name="_id"></input>
+          <button type="submit" class="btn">
+            <i class="icon-edit"></i>
+          </button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

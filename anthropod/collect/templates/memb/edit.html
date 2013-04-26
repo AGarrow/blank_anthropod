@@ -6,9 +6,13 @@
 {% endblock extra_head %}
 
 {% block content %}
+<h3>
+  Edit <a href={% url 'person.jsonview' obj.person.id %}>{{obj.person.display}}'s</a> membership in
+  <a href={% url 'organization.jsonview' obj.organization.id %}>{{obj.organization.display}}</a>.
+</h3>
 <form method="POST">
 {% csrf_token %}
-<input type="hidden" name="_id" value="{{ organization.id }}">
+<input type="hidden" name="_id" value="{{ obj.id }}">
 
 <table>
   <tbody>

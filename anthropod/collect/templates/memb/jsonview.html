@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block extra_head %}
+<script>
+$(document).ready(function() {
+  $(document).bind('keydown', 'd', function(){
+    $("#delete").click();
+  });
+  $(document).bind('keydown', 'e', function(){
+    window.location = "{% url 'memb.edit' obj.id %}";
+  });
+});
+</script>
+{% endblock extra_head %}
+{% block content %}
+<h2>
+  <a href={% url 'person.jsonview' obj.person.id %}>{{obj.person.display}}'s</a> membership in
+  <a href={% url 'organization.jsonview' obj.organization.id %}>{{obj.organization.display}}</a>.
+</h2>
+
+<div class="container">
+  <h2 class="pull-left">{{obj.name}}</h2>
+  <form action="{% url 'memb.delete' obj.id %}" method="POST" class="pull-right">
+    {% csrf_token %}
+    <input type="hidden" value="{{obj.id}}" name="_id"></input>
+    <button type="submit" class="btn btn-danger" id="delete">
+      <i class="icon-remove"></i>
+    </button>
+  </form>
+  <span class="pull-right">&nbsp;</span>
+  <form action="{% url 'memb.edit' _id=obj.id %}" method="GET" class="pull-right">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">
+      <i class="icon-pencil"></i>
+    </button>
+  </form>
+</div>
+
+<h3>json</h3>
+<pre>
+    {{obj.pretty_print}}
+</pre>
+
+<hr/>
+{% endblock %}

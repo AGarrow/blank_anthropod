@@ -1,4 +1,4 @@
-{% extends "organization/base.html" %}
+{% extends "base.html" %}
 {% load staticfiles %}
 
 {% block extra_head %}
@@ -23,16 +23,14 @@ $(document).ready(function() {
 </script>
 {% endblock extra_head %}
 
-{% block organization_header %}
+{% block content %}
   <span class='pull-right'>
     <a href="{% url 'organization.create' %}">
       <button type="button" class="btn btn primary">Create new organization</button>
     </a>
   </span>
   <h1>Organizations</h1>
-{% endblock %}
 
-{% block organization_content %}
   {% include "organization/_table.html" %}
   {% with object_list=organizations %}
     {% include "_pagination.html" %}

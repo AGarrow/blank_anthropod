@@ -3,18 +3,27 @@
 
 {% block extra_head %}
   {% include "geo/select_form_media.html" %}
-  <script src="{% static 'js/site/geo-select.js' %}"></script>
+  <script src="{% static 'js/site/person-select.js' %}"></script>
+<script>
+$(document).ready(function(){
+  add_another({name: 'person'});
+  $(document).bind('typeahead:selected', function(event, data){
+    add_another({name: 'person'});
+  });
+});
+</script>
 {% endblock extra_head %}
 
 {% block content %}
-<h1>Select a place</h1>
+<h1>Choose people to add to this organization</h1>
 <div class="container">
   {% comment %}
   Note: the form needs "navbar-form" as a class in order for the
   typeahead plugin to play nicely with bootstrap's styles.
   More info in issue #164: https://github.com/twitter/typeahead.js/issues/164.
   {% endcomment %}
-  <form id="geo-form" class="navbar-form" method="POST" action="{% url 'geo.select' %}">
+  <form class="navbar-form" method="POST" action="{% url 'org.memb.add.person' org_id %}">
+    <input type="hidden" name="org_id" value="{{org_id}}">
     <div class="row-fluid">
       <div class="span7" id="inputs">
           {% csrf_token %}
@@ -22,11 +31,10 @@
       <div class="span5 well">
         <h3>Instructions</h3>
         <p>
-          Start typing a state, then select it search again for
-          a place located within the state. Then click on the
-          enter button to submit.
+          Start typing a person. If a person you recently added isn't
+          showing up, remove the focus from the input box and press
+          "q" to clear the local cache, then try again.
         </p>
-        <input type="hidden" name="id" id="final-id">
         <p><input type="submit" class="btn" value="Submit"></p>
       </div>
     </div>

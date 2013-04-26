@@ -1,0 +1,19 @@
+{% extends "memb/base.html" %}
+{% block viewname %}&nbsp;/&nbsp;confirm delete{% endblock %}
+{% block memb_content %}
+<h2>{{memb.person.display}}'s membership in {{memb.organization.display}}.</h2>
+
+  <form action="{% url 'person.memb.really_delete' %}" method="POST">
+    {% csrf_token %}
+    <input type="hidden" value="{{memb.id}}" name="_id"></input>
+    <input type="hidden" value="{{memb.person.id}}" name="person_id"></input>
+    <button type="submit" class="btn btn-danger">
+      <i class="icon-remove"></i> Really delete this membership?
+    </button>
+  </form>
+
+  <pre>
+      {{memb.pretty_print}}
+  </pre>
+
+{% endblock %}

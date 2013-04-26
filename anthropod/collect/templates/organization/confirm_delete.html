@@ -1,11 +1,11 @@
-{% extends "organization/base.html" %}
+{% extends "base.html" %}
 {% block viewname %}&nbsp;/&nbsp;confirm delete{% endblock %}
-{% block organization_content %}
+{% block content %}
 <h2>name: {{obj.name}}</h2>
 
   <form action="{% url 'organization.really_delete' %}" method="POST">
     {% csrf_token %}
-    <input type="hidden" value="{{obj.id_string}}" name="_id"></input>
+    <input type="hidden" value="{{obj.id}}" name="_id"></input>
     <button type="submit" class="btn btn-danger">
       <i class="icon-remove"></i> Really delete this organization?
     </button>
@@ -16,7 +16,7 @@
       {{obj.people.count}} people documents are associated with this organization. Delete them as well?
       <ul>
       {% for person in obj.people %}
-        <li><a href="{{person.detail_url}}">{{person.display}}</a></li>
+        <li><a href="{{person.jsonview_url}}">{{person.display}}</a></li>
       {% endfor %}
     </ul>
   </div>

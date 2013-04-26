@@ -4,6 +4,7 @@ import logging
 from django.views.generic.base import View
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.core.urlresolvers import reverse
 from django.conf import settings
 
 import requests
@@ -14,7 +15,8 @@ from anthropod.core import db
 class Select(View):
 
     def get(self, request):
-        return render(request, 'geo/select.html', {})
+        context = dict(nav_active='geo', action_url=reverse('geo.select'))
+        return render(request, 'geo/select.html', context)
 
     def post(self, request):
         _id = request.POST.get('id')
@@ -38,8 +40,7 @@ def child_id_json(request, _id):
 
 
 def detail(request, _id):
-    context = {'id': _id}
+    context = dict(id=_id, nav_active='geo')
     spec = dict(geography_id=_id)
     context['organizations'] = db.organizations.find(spec)
     return render(request, 'geo/detail.html', context)
-

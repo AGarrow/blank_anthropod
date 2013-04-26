@@ -1,14 +1,18 @@
+import json
+
 from django.views.generic.base import View
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.http import HttpResponse
 
 import larvae.organization
 
 from ...core import db
 from ...models.paginators import CursorPaginator
-from ...models.utils import get_id
+from ...models.base import _PrettyPrintEncoder
+from ...models.utils import get_id, generate_id
 from ..forms.organization import EditForm
 
 
@@ -18,17 +22,23 @@ def create(self):
 
 class Edit(View):
 
+    collection = db.organizations
+    validator = larvae.organization.Organization
+
     def get(self, request, geo_id=None, _id=None):
         if _id is not None:
+            # Edit an existing object.
             _id = get_id(_id)
-            obj = db.organizations.find_one(_id)
+            obj = self.collection.find_one(_id)
             context = dict(
                 obj=obj,
                 form=EditForm.from_popolo(obj),
                 action='edit')
         else:
+            # Create a new object.
             form = EditForm(initial=dict(geography_id=geo_id))
             context = dict(form=form, action='create')
+        context['nav_active'] = 'org'
         return render(request, 'organization/edit.html', context)
 
     def post(self, request, geo_id=None, _id=None):
@@ -36,36 +46,39 @@ class Edit(View):
         if form.is_valid():
             obj = form.as_popolo(request)
 
+            if _id is not None:
+                # Apply the form changes to the existing object.
+                _id = get_id(_id)
+                existing_obj = self.collection.find_one(_id)
+                existing_obj.update(obj)
+                obj = existing_obj
+                msg = 'Successfully edited organization named %(name)s.'
+            else:
+                obj['_id'] = generate_id('organization')
+                msg = 'Successfully created new organization named %(name)s.'
+
             # Validate the org.
-            obj = larvae.organization.Organization(**obj)
+            obj = self.validator(**obj)
             obj.validate()
             obj = obj.as_dict()
 
-            # If this request is editing an existing obj,
-            # add the id to the popolo data.
-            if _id is not None:
-                msg = 'Successfully edited organization named %(name)s.'
-                _id = get_id(_id)
-                obj['_id'] = _id
-            else:
-                msg = 'Successfully created new organization named %(name)s.'
-
-            _id = db.organizations.save(obj)
+            # Save.
+            _id = self.collection.save(obj)
             messages.success(request, msg % obj)
-            return redirect('organization.detail', _id=_id)
+            return redirect('organization.jsonview', _id=_id)
         else:
             return render(request, 'organization/edit.html', dict(form=form))
 
 
-def detail(request, _id):
+def jsonview(request, _id):
     _id = get_id(_id)
     obj = db.organizations.find_one(_id)
-    context = dict(obj=obj)
-    return render(request, 'organization/detail.html', context)
+    context = dict(obj=obj, nav_active='org')
+    return render(request, 'organization/jsonview.html', context)
 
 
 def listing(request):
-    context = {}
+    context = dict(nav_active='org')
     page = int(request.GET.get('page', 1))
     orgs = db.organizations.find()
     context['organizations'] = CursorPaginator(orgs, page=page, show_per_page=10)
@@ -78,7 +91,7 @@ def delete(request):
     _id = request.POST.get('_id')
     _id = get_id(_id)
     obj = db.organizations.find_one(_id)
-    context = dict(obj=obj)
+    context = dict(obj=obj, nav_active='org')
     return render(request, 'organization/confirm_delete.html', context)
 
 
@@ -93,13 +106,17 @@ def really_delete(request):
     return redirect(reverse('organization.list'))
 
 
-# @require_POST
-# def remove_person(request, organization_id, person_id):
-#     person_id = bson.objectid.ObjectId(person_id)
-#     person = db.people.find_one(person_id)
-#     del person['organization_id']
-#     db.people.save(person)
-#     msg = 'Suggessfully removed %s from organization.'
-#     messages.success(request, msg % person['name'])
-#     kwargs = dict(_id=organization_id)
-#     return redirect(reverse('organization.detail', kwargs=kwargs))
+def json_for_geo(request, geo_id):
+    '''Return typeahead widget orgs json for a given geo_id.
+    '''
+    data = []
+    spec = dict(geography_id=geo_id)
+    fields = ('name',)
+    for org in db.organizations.find(spec, fields):
+        org['value'] = org.display()
+        del org['name']
+        data.append(org)
+
+    resp = HttpResponse(mimetype='application/json', status=200)
+    json.dump(data, resp, cls=_PrettyPrintEncoder)
+    return resp

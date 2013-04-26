@@ -1,4 +1,4 @@
-{% extends "person/base.html" %}
+{% extends "base.html" %}
 {% load staticfiles %}
 
 {% block extra_head %}
@@ -15,16 +15,12 @@ div.nopadding {
 </style>
 {% endblock extra_head %}
 
-{% block person_header %}
+{% block content %}
   <span class='pull-right'>
     <a href="{% url 'person.create' %}">
-      <button type="button" id="create" class="btn btn primary">Create new person</button>
+    <button type="button" id="create" class="btn btn primary">Create new person</button>
     </a>
   </span>
-  <h1>People</h1>
-{% endblock %}
-
-{% block person_content %}
   {% include "person/_table.html" %}
   {% with object_list=people %}
     {% include "_pagination.html" %}

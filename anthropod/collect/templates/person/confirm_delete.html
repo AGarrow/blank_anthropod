@@ -1,6 +1,6 @@
-{% extends "person/base.html" %}
-{% block viewname %}&nbsp;/&nbsp;confirm delete{% endblock %}
-{% block person_content %}
+{% extends "base.html" %}
+
+{% block content %}
 <h2>name: {{person.name}}</h2>
 
   <form action="{% url 'person.really_delete' %}" method="POST">

@@ -1,0 +1,11 @@
+{% load staticfiles %}
+{% if debug %}
+<script src="{% static 'js/typeahead.js' %}"></script>
+<script src="{% static 'js/hogan-2.0.0.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/typeahead.js-bootstrap.css' %}">
+{% else %}
+<script src="{% static 'js/typeahead.min.js' %}"></script>
+<script src="{% static 'js/hogan-2.0.0.min.js' %}"></script>
+{% endif %}
+<link rel="stylesheet" href="{% static 'css/typeahead.js-bootstrap.css' %}">
+

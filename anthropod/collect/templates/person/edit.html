@@ -1,18 +1,11 @@
-{% extends "person/base.html" %}
+{% extends "base.html" %}
 {% load staticfiles %}
 
 {% block extra_head %}
     <script src="{% static 'js/site/forms.js' %}"></script>
 {% endblock extra_head %}
 
-{% block person_header %}
-  <h1>
-    <a href="{% url 'person.list' %}">People</a>
-    &nbsp;/&nbsp;{{action}}
-  </h1>
-{% endblock %}
-
-{% block person_content %}
+{% block content %}
 <form method="POST">
 {% csrf_token %}
 <input type="hidden" name="_id" value="{{ person.id }}">

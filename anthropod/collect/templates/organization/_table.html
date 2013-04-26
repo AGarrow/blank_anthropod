@@ -9,7 +9,7 @@
   <tbody>
     {% for organization in organizations %}
     <tr>
-      <td><a href="{% url 'organization.detail' _id=organization.id %}">{{organization.name}}</td>
+      <td><a href="{% url 'organization.jsonview' _id=organization.id %}">{{organization.name}}</td>
       <td>
         <a href="{% url 'geo.detail' organization.geography_id %}">
           {{organization.geography_id}}
