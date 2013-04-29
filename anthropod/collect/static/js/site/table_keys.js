@@ -59,8 +59,8 @@ $(document).ready(function() {
     }
   }
   $(document).bind('keydown', 'j', down);
-  $(document).bind('keydown', 'down', down);
+  // $(document).bind('keydown', 'down', down);
   $(document).bind('keydown', 'k', up);
-  $(document).bind('keydown', 'up', up);
+  // $(document).bind('keydown', 'up', up);
 
 });

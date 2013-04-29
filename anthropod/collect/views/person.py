@@ -10,11 +10,10 @@ import larvae.person
 import larvae.membership
 
 from ...core import db
-from ..forms.person import getform
+from ..forms.person import EditForm
 from ...models.paginators import CursorPaginator
 from ...models.utils import get_id, generate_id
 from ...models.base import _PrettyPrintEncoder
-from .utils import reverse_params
 
 
 class Edit(View):
@@ -29,22 +28,21 @@ class Edit(View):
             person = self.collection.find_one(_id)
             context = dict(
                 person=person,
-                form=getform().from_popolo(person),
+                form=EditForm.from_popolo(person),
                 action='edit')
         else:
             # Create a new object.
-            context = dict(form=getform(), action='create')
+            context = dict(form=EditForm(), action='create')
         context['nav_active'] = 'person'
         return render(request, 'person/edit.html', context)
 
     def post(self, request, _id=None):
-        form = getform()(request.POST)
+        form = EditForm(request.POST)
         if form.is_valid():
             obj = form.as_popolo(request)
 
             if _id is not None:
                 # Apply the form changes to the existing object.
-                _id = get_id(_id)
                 existing_obj = self.collection.find_one(_id)
                 existing_obj.update(obj)
                 obj = existing_obj

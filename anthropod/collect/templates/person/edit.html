@@ -45,10 +45,10 @@
     </thead>
     <tbody>
     {% if form.is_bound %}
-      {% for url, link in form.sources %}
+      {% for source in form.sources %}
       <tr>
-        <td><input id="id_source_url" name="source_url" type="text" value="{{url}}"/></td>
-        <td><input id="id_source_note" name="source_note" type="text" value="{{link}}"/></td>
+        <td><input id="id_source_url" name="source_url" type="text" value="{{source.url}}"/></td>
+        <td><input id="id_source_note" name="source_note" type="text" value="{{source.note}}"/></td>
         <td>
           <button class="btn remove-row">
             <i class="icon-remove"></i>
@@ -144,10 +144,10 @@
     </thead>
     <tbody>
     {% if form.is_bound %}
-      {% for url, link in form.links %}
+      {% for link in form.links %}
       <tr>
-        <td><input id="id_link_url" name="link_url" type="text" value="{{url}}"/></td>
-        <td><input id="id_link_note" name="link_note" type="text" value="{{link}}"/></td>
+        <td><input id="id_link_url" name="link_url" type="text" value="{{link.url}}"/></td>
+        <td><input id="id_link_note" name="link_note" type="text" value="{{link.note}}"/></td>
         <td>
           <button class="btn remove-row">
             <i class="icon-remove"></i>

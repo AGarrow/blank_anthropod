@@ -2,7 +2,6 @@ from operator import itemgetter
 
 from django import forms
 
-from anthropod.core import db
 from .base import BaseForm
 
 
@@ -120,10 +119,3 @@ class EditForm(BaseForm):
         form.alt_names = alternate_names
         form.sources = person.get('sources')
         return form
-
-
-def getform():
-    '''This will have the same problem of hitting mongo
-    for the contents of the dropdown list.
-    '''
-    return EditForm
