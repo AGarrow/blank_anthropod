@@ -64,5 +64,5 @@ def really_delete(request):
     msg = "Deleted %s's membership in %r." % vals
     kwargs = dict(_id=obj.organization().id)
     db.memberships.remove(_id)
-    messages.info(request, msg % _id)
+    messages.info(request, msg)
     return redirect(reverse('organization.jsonview', kwargs=kwargs))
