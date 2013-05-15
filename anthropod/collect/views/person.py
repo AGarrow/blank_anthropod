@@ -52,7 +52,7 @@ class Edit(View):
                 msg = 'Successfully created new person named %(name)s.'
 
             # Check for popolo compliance.
-            del obj['_type']
+            obj.pop('_type', None)
             obj = self.validator(**obj)
             obj.validate()
             obj = obj.as_dict()
