@@ -58,6 +58,7 @@ class Edit(View):
                 msg = 'Successfully created new organization named %(name)s.'
 
             # Validate the org.
+            obj.pop('_type', None)
             obj = self.validator(**obj)
             obj.validate()
             obj = obj.as_dict()
