@@ -87,6 +87,7 @@ def really_delete(request):
     _id = request.POST.get('_id')
     _id = get_id(_id)
     person = db.people.find_one(_id)
+    db.memberships.remove(dict(person_id=person.id))
     db.people.remove(_id)
     msg = 'Deleted person %r with id %r.'
     messages.info(request, msg % (person['name'], _id))
