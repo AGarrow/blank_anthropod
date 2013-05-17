@@ -16,9 +16,16 @@ div.nopadding {
 {% endblock extra_head %}
 
 {% block content %}
+  <span class='pull-right' style="padding-left: 5px;">
+    <a href="{% url 'person.find' %}">
+    <button type="button" id="find" class="btn">
+      <i class="icon icon-search"></i>
+    </button>
+    </a>
+  </span>
   <span class='pull-right'>
     <a href="{% url 'person.create' %}">
-    <button type="button" id="create" class="btn btn primary">Create new person</button>
+    <button type="button" id="create" class="btn">Create new person</button>
     </a>
   </span>
   {% include "person/_table.html" %}
