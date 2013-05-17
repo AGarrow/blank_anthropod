@@ -1,4 +1,6 @@
 from django.conf.urls import patterns, url
+from django.views.generic import TemplateView
+
 from .views import person, person_memb
 from .views import organization, org_memb
 from .views import geo, membership
@@ -12,6 +14,7 @@ urlpatterns = patterns('anthropod.collect.views.person',
     url(r'^person/really_delete/$', 'really_delete', name='person.really_delete'),
     url(r'^person/json/$', 'all_json', name='person.json'),
     url(r'^person/$', 'listing', name='person.listing'),
+    url(r'^person/find/$', TemplateView.as_view(template_name='person/find.html'), name='person.find'),
 )
 
 urlpatterns += patterns('anthropod.collect.views.person_memb',
