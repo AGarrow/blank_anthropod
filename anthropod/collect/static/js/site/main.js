@@ -67,4 +67,8 @@ $(document).ready(function() {
     console.log('Cleared local storage.');
     location.reload(true);
   });
+
+  $(document).bind('keydown', 'f', function(){
+    $('#find').click();
+  });
 });
