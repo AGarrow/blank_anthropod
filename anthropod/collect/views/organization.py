@@ -101,6 +101,7 @@ def really_delete(request):
     _id = request.POST.get('_id')
     _id = get_id(_id)
     obj = db.organizations.find_one(_id)
+    db.memberships.remove(dict(organization_id=obj.id))
     db.organizations.remove(_id)
     msg = 'Deleted obj %r with id %r.'
     messages.success(request, msg % (obj['name'], _id))
