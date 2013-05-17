@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra_head %}
+  {% include "geo/select_form_media.html" %}
+  <script src="{% static 'js/site/person-find.js' %}"></script>
+<script>
+$(document).ready(function(){
+  add_another({name: 'person'});
+  $(document).bind('typeahead:selected', function(event, data){
+    add_another({name: 'person'});
+  });
+  // Fires when a suggestion is chosen from the typeahead drop-down.
+  $(document).bind('typeahead:selected', function(event, data){
+    // console.log("/collect/person/jsonview/" + data._id);
+    window.location.href = "/collect/person/jsonview/" + data._id;
+  });
+});
+</script>
+{% endblock extra_head %}
+
+{% block content %}
+<h1>Find a person</h1>
+<div class="container">
+  {% comment %}
+  Note: the form needs "navbar-form" as a class in order for the
+  typeahead plugin to play nicely with bootstrap's styles.
+  More info in issue #164: https://github.com/twitter/typeahead.js/issues/164.
+  {% endcomment %}
+  <form class="navbar-form" method="POST" action="{% url 'person.find' %}">
+    <div class="row-fluid">
+      <div class="span7" id="inputs">
+          {% csrf_token %}
+      </div>
+      <div class="span5 well">
+        <h3>Instructions</h3>
+        <p>
+          Start typing a person. If a person you recently added isn't
+          showing up, remove the focus from the input box and press
+          "q" to clear the local cache, then try again.
+        </p>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% endblock content %}
