@@ -1,7 +1,20 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block content %}
 <h2>{{person.name}}</h2>
+
+  {% if person.memberships.count %}
+  <div>
+    <table class="table">
+      <tr class="error">
+        <td>
+          NOTE: {{person.memberships.count|apnumber|title}} memberships associated with this person will also be deleted.
+        </td>
+      </tr>
+    </table>
+  </div>
+  {% endif %}
 
   <form action="{% url 'person.really_delete' %}" method="POST">
     {% csrf_token %}
