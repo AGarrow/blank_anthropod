@@ -1,3 +1,8 @@
+'''Deletes memberships whose person_id or organization_id isn't
+a valid id for an existing person or org. We have some of those ids
+present due to anthropod not previously deleting related memberships
+if a person or org is deleted (fixed by ef74b92).
+'''
 from anthropod.core import db
 
 
