@@ -47,6 +47,7 @@ class Edit(View):
             msg_args = (obj.person().display(), obj.organization().display())
 
             # Validate the org.
+            obj.pop('_type', None)
             obj = self.validator(**obj)
             obj.validate()
             obj = obj.as_dict()
