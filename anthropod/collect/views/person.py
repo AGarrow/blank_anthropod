@@ -62,7 +62,9 @@ class Edit(View):
             messages.info(request, msg % obj)
             return redirect('person.jsonview', _id=_id)
         else:
-            return render(request, 'person/edit.html', dict(form=form))
+            obj = self.collection.find_one(_id)
+            context = dict(form=form, obj=obj)
+            return render(request, 'person/edit.html', context)
 
 
 def listing(request):

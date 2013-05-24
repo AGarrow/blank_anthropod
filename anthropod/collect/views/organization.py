@@ -68,7 +68,9 @@ class Edit(View):
             messages.success(request, msg % obj)
             return redirect('organization.jsonview', _id=_id)
         else:
-            return render(request, 'organization/edit.html', dict(form=form))
+            obj = self.collection.find_one(_id)
+            context = dict(form=form, obj=obj)
+            return render(request, 'organization/edit.html', context)
 
 
 def jsonview(request, _id):
