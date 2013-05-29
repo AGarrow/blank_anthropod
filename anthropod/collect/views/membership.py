@@ -2,15 +2,17 @@ from django.views.generic.base import View
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 
 import larvae.membership
 
 from ...core import db
 from ...models.utils import get_id
 from ..forms.memb import EditForm
+from .base import RestrictedView
 
 
-class Edit(View):
+class Edit(RestrictedView):
 
     collection = db.memberships
     validator = larvae.membership.Membership
@@ -69,5 +71,6 @@ def jsonview(request, _id):
 
 
 @require_POST
+@login_required
 def delete(request, _id):
     pass

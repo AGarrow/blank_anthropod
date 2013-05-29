@@ -1,9 +1,9 @@
 import json
 
 from django.http import HttpResponse
-from django.views.generic.base import View
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 
 import larvae.person
@@ -14,9 +14,10 @@ from ..forms.person import EditForm
 from ...models.paginators import CursorPaginator
 from ...models.utils import get_id, generate_id
 from ...models.base import _PrettyPrintEncoder
+from .base import RestrictedView
 
 
-class Edit(View):
+class Edit(RestrictedView):
 
     collection = db.people
     validator = larvae.person.Person
@@ -67,6 +68,7 @@ class Edit(View):
             return render(request, 'person/edit.html', context)
 
 
+
 def listing(request):
     context = dict(nav_active='person')
     page = int(request.GET.get('page', 1))
@@ -76,6 +78,7 @@ def listing(request):
 
 
 @require_POST
+@login_required
 def delete(request):
     '''Confirm delete.'''
     _id = request.POST.get('_id')
@@ -85,6 +88,7 @@ def delete(request):
 
 
 @require_POST
+@login_required
 def really_delete(request):
     _id = request.POST.get('_id')
     _id = get_id(_id)

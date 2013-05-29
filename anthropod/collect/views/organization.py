@@ -1,11 +1,12 @@
 import json
 
+from django.http import HttpResponse
 from django.views.generic.base import View
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
-from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 
 import larvae.organization
 
@@ -14,13 +15,14 @@ from ...models.paginators import CursorPaginator
 from ...models.base import _PrettyPrintEncoder
 from ...models.utils import get_id, generate_id
 from ..forms.organization import EditForm
+from .base import RestrictedView
 
 
 def create(self):
     return redirect('geo.select')
 
 
-class Edit(View):
+class Edit(RestrictedView):
 
     collection = db.organizations
     validator = larvae.organization.Organization
@@ -89,6 +91,7 @@ def listing(request):
 
 
 @require_POST
+@login_required
 def delete(request):
     '''Confirm delete.'''
     _id = request.POST.get('_id')
@@ -99,6 +102,7 @@ def delete(request):
 
 
 @require_POST
+@login_required
 def really_delete(request):
     _id = request.POST.get('_id')
     _id = get_id(_id)

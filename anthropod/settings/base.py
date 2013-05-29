@@ -3,7 +3,7 @@ from os.path import abspath, dirname, join
 
 PROJECT_ROOT = abspath(join(dirname(__file__), '..'))
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -52,7 +52,13 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.request',
+    'django.contrib.auth.context_processors.auth',
+)
+
 MIDDLEWARE_CLASSES = (
+    # 'debug_middleware.DebugMiddleWare',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -80,7 +86,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    # 'django.contrib.admin',
+    'locksmith.mongoauth',
+    'social_auth',
     'anthropod.collect',
 )
 
@@ -109,3 +116,20 @@ LOGGING = {
         },
     }
 }
+
+
+AUTHENTICATION_BACKENDS = (
+    'sunlightauth.backends.SunlightBackend',
+    #'django.contrib.auth.backends.ModelBackend',
+)
+
+SUNLIGHT_AUTH_BASE_URL = 'http://login.sunlightfoundation.com/'
+# SUNLIGHT_AUTH_APP_ID = 'anthropod'
+SUNLIGHT_AUTH_APP_ID = 'openstates'
+#SUNLIGHT_AUTH_SECRET = 'set in local settings'
+SUNLIGHT_AUTH_SCOPE = []
+
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/login/sunlight/'
+
+LOCKSMITH_REGISTRATION_URL = 'http://services.sunlightlabs.com/accounts/register/'

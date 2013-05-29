@@ -1,14 +1,14 @@
-
-from django.views.generic.base import View
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 
 import larvae.membership
 
 from ...core import db
 from ...models.utils import get_id
+from .base import RestrictedView
 
 
 def listing(request, _id):
@@ -19,7 +19,7 @@ def listing(request, _id):
 
 
 # Views for adding/deleting memberships.
-class SelectGeo(View):
+class SelectGeo(RestrictedView):
     '''This page enables the user to choose a geography within
     which to search for organizations to create a membership
     for this person.
@@ -36,7 +36,7 @@ class SelectGeo(View):
         return redirect('person.memb.add.org', **url_kwargs)
 
 
-class SelectOrg(View):
+class SelectOrg(RestrictedView):
     '''This page enables the user to choose an organization within
     a georgraphy to create a membership for this person.
     '''
@@ -71,6 +71,7 @@ class SelectOrg(View):
 
 
 @require_POST
+@login_required
 def delete(request):
     '''Confirm delete.'''
     # Get the membership id.
@@ -82,6 +83,7 @@ def delete(request):
 
 
 @require_POST
+@login_required
 def really_delete(request):
     # Get the membership id.
     _id = request.POST.get('_id')
