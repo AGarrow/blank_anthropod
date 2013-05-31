@@ -15,7 +15,7 @@ from ..forms.person import EditForm
 from ...models.paginators import CursorPaginator
 from ...models.utils import get_id, generate_id
 from ...models.base import _PrettyPrintEncoder
-from ..permissions import check_permissions, permission_required
+from ..permissions import permission_required
 from .base import RestrictedView
 
 
@@ -26,8 +26,9 @@ class Edit(RestrictedView):
 
     def get(self, request, _id=None):
         if _id is not None:
+            self.check_permissions(request, 'person.edit')
+
             # Edit an existing object.
-            check_permissions(request, 'person.edit')
             _id = get_id(_id)
             person = self.collection.find_one(_id)
             context = dict(
@@ -35,8 +36,9 @@ class Edit(RestrictedView):
                 form=EditForm.from_popolo(person),
                 action='edit')
         else:
+            self.check_permissions(request, 'person.create')
+
             # Create a new object.
-            check_permissions(request, 'person.create')
             context = dict(form=EditForm(), action='create')
         context['nav_active'] = 'person'
         return render(request, 'person/edit.html', context)
@@ -47,12 +49,16 @@ class Edit(RestrictedView):
             obj = form.as_popolo(request)
 
             if _id is not None:
+                self.check_permissions(request, 'person.edit')
+
                 # Apply the form changes to the existing object.
                 existing_obj = self.collection.find_one(_id)
                 existing_obj.update(obj)
                 obj = existing_obj
                 msg = 'Successfully updated person named %(name)s.'
             else:
+                self.check_permissions(request, 'person.create')
+
                 obj['_id'] = generate_id('person')
                 msg = 'Successfully created new person named %(name)s.'
 
