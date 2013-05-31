@@ -41,7 +41,6 @@ class Edit(RestrictedView):
         context['nav_active'] = 'person'
         return render(request, 'person/edit.html', context)
 
-    @permission_required('people', 'edit')
     def post(self, request, _id=None):
         form = EditForm(request.POST)
         if form.is_valid():
@@ -83,7 +82,7 @@ def listing(request):
 
 @require_POST
 @login_required
-@permission_required('person', 'delete')
+@permission_required('person.delete')
 def delete(request):
     '''Confirm delete.'''
     _id = request.POST.get('_id')
@@ -94,7 +93,7 @@ def delete(request):
 
 @require_POST
 @login_required
-@permission_required('person', 'delete')
+@permission_required('person.delete')
 def really_delete(request):
     _id = request.POST.get('_id')
     _id = get_id(_id)
