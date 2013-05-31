@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra_head %}
+<link href='http://fonts.googleapis.com/css?family=Herr+Von+Muellerhoff' rel='stylesheet' type='text/css'>
+<style>
+span.silly {
+  font-family: 'Herr Von Muellerhoff', cursive;
+  color: #E01B5D;
+  font-size: 100px;
+}
+.ah-ah-ah {
+  width: 500px ;
+  margin-left: auto ;
+  margin-right: auto ;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="ah-ah-ah">
+    <h1><span class="silly ah-ah-ah">Permission Denied</span></h1>
+    <img class="ah-ah-ah" src="{% static 'img/newmann.gif' %}">
+    <div class="ah-ah-ah">
+      <h4>You need the following permissions to do that:</h4>
+      <ul>
+        {% for permission in request.anthropod_permissions %}
+          <li>{{permission}}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
