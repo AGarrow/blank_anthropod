@@ -21,11 +21,11 @@ from .base import RestrictedView
 class Edit(RestrictedView):
 
     collection = db.people
-    validator = larvae.person.Person
+    validator = larvae.people.Person
 
     def get(self, request, _id=None):
         if _id is not None:
-            self.check_permissions(request, 'person.edit')
+            self.check_permissions(request, 'people.edit')
 
             # Edit an existing object.
             _id = get_id(_id)
@@ -35,7 +35,7 @@ class Edit(RestrictedView):
                 form=EditForm.from_popolo(person),
                 action='edit')
         else:
-            self.check_permissions(request, 'person.create')
+            self.check_permissions(request, 'people.create')
 
             # Create a new object.
             context = dict(form=EditForm(), action='create')
@@ -48,7 +48,7 @@ class Edit(RestrictedView):
             obj = form.as_popolo(request)
 
             if _id is not None:
-                self.check_permissions(request, 'person.edit')
+                self.check_permissions(request, 'people.edit')
 
                 # Apply the form changes to the existing object.
                 existing_obj = self.collection.find_one(_id)
@@ -56,7 +56,7 @@ class Edit(RestrictedView):
                 obj = existing_obj
                 msg = 'Successfully updated person named %(name)s.'
             else:
-                self.check_permissions(request, 'person.create')
+                self.check_permissions(request, 'people.create')
 
                 obj['_id'] = generate_id('person')
                 msg = 'Successfully created new person named %(name)s.'
@@ -87,7 +87,7 @@ def listing(request):
 
 @require_POST
 @login_required
-@permission_required('person.delete')
+@permission_required('people.delete')
 def delete(request):
     '''Confirm delete.'''
     _id = request.POST.get('_id')
@@ -98,7 +98,7 @@ def delete(request):
 
 @require_POST
 @login_required
-@permission_required('person.delete')
+@permission_required('people.delete')
 def really_delete(request):
     _id = request.POST.get('_id')
     _id = get_id(_id)
