@@ -1,4 +1,5 @@
 from pprint import pformat
+from optparse import make_option
 from difflib import get_close_matches
 
 from django.core.management.base import BaseCommand
@@ -7,12 +8,32 @@ from anthropod.core import db, user_db
 
 
 class Command(BaseCommand):
-    args = '<username1>[,<username2>[,<username3>]] <permission1> <permission2> ...'
-    help = ('Grant permissions to a user. Multiple emails can be '
-            'join with a comma.')
+    args = '<username1>[,<usernameN>] <permission1> <permission2> ...'
+    help = '''
+    Grant or revoke permissions for one or more users. Multiple
+    emails can be joined with a comma. Use --revoke to revoke
+    instead of grant.'''.strip('\n')
+
     can_import_settings = True
 
+    option_list = BaseCommand.option_list + (
+    make_option('--revoke',
+        action='store_true',
+        dest='revoke',
+        default=False,
+        help='Revoke permissions instead of granting them.'),
+    )
+
     def handle(self, usernames, *permissions, **options):
+
+        # Granting or revoking?
+        if options['revoke']:
+            verb = 'revoke'
+            action = '$unset'
+        else:
+            verb = 'grant'
+            action = '$set'
+
 
         # Complain if the collection name is mistyped.
         collection_names = db.collection_names()
@@ -25,19 +46,20 @@ class Command(BaseCommand):
                 suggestions = get_close_matches(collection_name, collection_names)
                 suggestions = suggestions or collection_names
                 suggestions = map(repr, suggestions)
-                msg = ("Can't grant permissions on collection %r; "
+                msg = ("Can't %s permissions on collection %r; "
                        "there is no such collection. Maybe you meant %s?")
-                args = (collection_name, ' or '.join(suggestions))
+                args = (verb, collection_name, ' or '.join(suggestions))
                 raise ValueError(msg % args)
 
         # Update the mongo permissions collection.
         permissions = dict.fromkeys(permissions, True)
-        document = {'$set': permissions}
+        document = {action: permissions}
         for username in usernames.split(','):
             spec = {'user_id': username}
-            msg = 'Granting user %r these permissions: %r'
-            self.stdout.write(msg % (username, permissions))
-            user_db.permissions.update(spec, document, upsert=True)
+            msg = '%s user %r these permissions: %r'
+            self.stdout.write(msg % (verb.title(), username, permissions))
+
+            user_db.permissions.update(spec, document, upsert=True, multi=True)
 
             # Show the new permissions.
             new_perms = user_db.permissions.find_one(spec)
