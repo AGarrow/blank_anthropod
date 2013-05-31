@@ -49,6 +49,13 @@
 
     <div class="container">
       <div class="masthead">
+        <div id="login" class="tip pull-right">
+          {% if request.user.is_authenticated %}
+            {{request.user.first_name|default:request.user}} | <a href="{% url 'logout' %}">sign out</a>
+          {% else %}
+            <a href="/login/sunlight/?next={{request.get_full_path}}">Login or Sign up</a>
+          {% endif %}
+        </div>
         <h3 class="muted">OCD Data Entry Test</h3>
         <div class="navbar">
           <div class="navbar-inner">
