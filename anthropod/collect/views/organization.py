@@ -15,6 +15,7 @@ from ...models.paginators import CursorPaginator
 from ...models.base import _PrettyPrintEncoder
 from ...models.utils import get_id, generate_id
 from ..forms.organization import EditForm
+from ..permissions import permission_required
 from .base import RestrictedView
 
 
@@ -29,6 +30,7 @@ class Edit(RestrictedView):
 
     def get(self, request, geo_id=None, _id=None):
         if _id is not None:
+            self.check_permissions(request, 'organizations.edit')
             # Edit an existing object.
             _id = get_id(_id)
             obj = self.collection.find_one(_id)
@@ -37,6 +39,7 @@ class Edit(RestrictedView):
                 form=EditForm.from_popolo(obj),
                 action='edit')
         else:
+            self.check_permissions(request, 'organizations.create')
             # Create a new object.
             form = EditForm(initial=dict(geography_id=geo_id))
             context = dict(form=form, action='create')
@@ -49,6 +52,7 @@ class Edit(RestrictedView):
             obj = form.as_popolo(request)
 
             if _id is not None:
+                self.check_permissions(request, 'organizations.edit')
                 # Apply the form changes to the existing object.
                 _id = get_id(_id)
                 existing_obj = self.collection.find_one(_id)
@@ -56,6 +60,7 @@ class Edit(RestrictedView):
                 obj = existing_obj
                 msg = 'Successfully edited organization named %(name)s.'
             else:
+                self.check_permissions(request, 'organizations.create')
                 obj['_id'] = generate_id('organization')
                 msg = 'Successfully created new organization named %(name)s.'
 
@@ -92,6 +97,7 @@ def listing(request):
 
 @require_POST
 @login_required
+@permission_required('organizations.delete')
 def delete(request):
     '''Confirm delete.'''
     _id = request.POST.get('_id')
@@ -103,6 +109,7 @@ def delete(request):
 
 @require_POST
 @login_required
+@permission_required('organizations.delete')
 def really_delete(request):
     _id = request.POST.get('_id')
     _id = get_id(_id)

@@ -1,6 +1,5 @@
 import json
 
-from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages

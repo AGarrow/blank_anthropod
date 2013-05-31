@@ -18,6 +18,8 @@ class Command(BaseCommand):
         collection_names = db.collection_names()
         collection_names.remove('system.indexes')
         for permission in permissions:
+            if permission == 'all':
+                continue
             collection_name, operation = permission.split('.')
             if collection_name not in collection_names:
                 suggestions = get_close_matches(collection_name, collection_names)

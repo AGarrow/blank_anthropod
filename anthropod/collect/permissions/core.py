@@ -12,7 +12,7 @@ def check_permissions(request, *permissions):
         '$or': [
 
             # Allow all permissions for admins.
-            {'*': True},
+            {'all': True},
 
             # Or explicitly set permissions.
             dict.fromkeys(permissions, True),
