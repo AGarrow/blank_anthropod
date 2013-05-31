@@ -8,6 +8,7 @@ import larvae.membership
 
 from ...core import db
 from ...models.utils import get_id
+from ..permissions import check_permissions, permission_required
 from .base import RestrictedView
 
 
@@ -25,12 +26,14 @@ class SelectGeo(RestrictedView):
     for this person.
     '''
     def get(self, request):
+        self.check_permissions(request, 'memberships.create')
         context = dict(
             person_id=request.GET['person_id'],
             nav_active='person')
         return render(request, 'person/memb/select_geo.html', context)
 
     def post(self, request, person_id):
+        self.check_permissions(request, 'memberships.create')
         _id = request.POST.get('id')
         url_kwargs = dict(geo_id=_id, person_id=person_id)
         return redirect('person.memb.add.org', **url_kwargs)
@@ -47,6 +50,7 @@ class SelectOrg(RestrictedView):
         '''The geo_id is named `id` because we're reusing the geo select
         template for the referer page.
         '''
+        self.check_permissions(request, 'memberships.create')
         person_id = request.GET['person_id']
         geo_id = request.GET['id']
         context = dict(
@@ -56,6 +60,7 @@ class SelectOrg(RestrictedView):
         return render(request, 'person/memb/select_org.html', context)
 
     def post(self, request):
+        self.check_permissions(request, 'memberships.create')
         org_ids = request.POST.getlist('org_id')
         person_id = request.POST['person_id']
         for org_id in org_ids:
@@ -72,6 +77,7 @@ class SelectOrg(RestrictedView):
 
 @require_POST
 @login_required
+@permission_required('memberships.delete')
 def delete(request):
     '''Confirm delete.'''
     # Get the membership id.
@@ -84,6 +90,7 @@ def delete(request):
 
 @require_POST
 @login_required
+@permission_required('memberships.delete')
 def really_delete(request):
     # Get the membership id.
     _id = request.POST.get('_id')

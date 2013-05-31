@@ -7,7 +7,7 @@ from ..permissions import check_permissions
 
 class RestrictedView(View):
 
-    check_permissions = check_permissions
+    check_permissions = staticmethod(check_permissions)
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):

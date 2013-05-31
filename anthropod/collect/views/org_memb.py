@@ -9,6 +9,7 @@ import larvae.membership
 
 from ...core import db
 from ...models.utils import get_id
+from ..permissions import check_permissions, permission_required
 from .base import RestrictedView
 
 
@@ -27,10 +28,12 @@ class SelectPerson(RestrictedView):
     validator = larvae.membership.Membership
 
     def get(self, request, org_id):
+        self.check_permissions(request, 'memberships.create')
         context = dict(nav_active='memb', org_id=org_id)
         return render(request, 'organization/memb/select_person.html', context)
 
     def post(self, request, org_id=None):
+        self.check_permissions(request, 'memberships.create')
         person_ids = request.POST.getlist('person_id')
         org_id = request.POST.get('org_id')
         for person_id in person_ids:
@@ -46,6 +49,7 @@ class SelectPerson(RestrictedView):
 
 @require_POST
 @login_required
+@permission_required('memberships.delete')
 def delete(request):
     '''Confirm delete.'''
     # Get the membership id.
@@ -58,6 +62,7 @@ def delete(request):
 
 @require_POST
 @login_required
+@permission_required('memberships.delete')
 def really_delete(request):
     # Get the membership id.
     _id = request.POST.get('_id')

@@ -9,6 +9,7 @@ import larvae.membership
 from ...core import db
 from ...models.utils import get_id
 from ..forms.memb import EditForm
+from ..permissions import check_permissions, permission_required
 from .base import RestrictedView
 
 
@@ -19,6 +20,8 @@ class Edit(RestrictedView):
 
     def get(self, request, _id=None):
         if _id is not None:
+            check_permissions(request, 'memberships.edit')
+
             # Edit an existing object.
             _id = get_id(_id)
             obj = self.collection.find_one(_id)
@@ -27,6 +30,8 @@ class Edit(RestrictedView):
                 form=EditForm.from_popolo(obj),
                 action='edit')
         else:
+            check_permissions(request, 'memberships.create')
+
             # Create a new object.
             context = dict(form=EditForm(), action='create')
         context['nav_active'] = 'memb'
@@ -38,6 +43,8 @@ class Edit(RestrictedView):
             obj = form.as_popolo(request)
 
             if _id is not None:
+                check_permissions(request, 'memberships.edit')
+
                 # Apply the form changes to the existing object.
                 _id = get_id(_id)
                 existing_obj = self.collection.find_one(_id)
@@ -45,7 +52,10 @@ class Edit(RestrictedView):
                 obj = existing_obj
                 msg = "Successfully edited %s's membership in %s."
             else:
-                msg = "Successfully edited %s's membership in %s."
+                check_permissions(request, 'memberships.create')
+
+                msg = "Successfully created %s's membership in %s."
+
             msg_args = (obj.person().display(), obj.organization().display())
 
             # Validate the org.
@@ -72,5 +82,6 @@ def jsonview(request, _id):
 
 @require_POST
 @login_required
+@permission_required('memberships.delete')
 def delete(request, _id):
-    pass
+    raise NotImplemented
