@@ -7,7 +7,18 @@ def check_permissions(request, *permissions):
     '''Check whether the request.user has the specified permissions;
     if not, raise PermissionDenied.
     '''
-    spec = dict(dict.fromkeys(permissions, True), user_id=request.user.id)
+    spec = {
+        'user_id': request.user.username,
+        '$or': [
+
+            # Allow all permissions for admins.
+            {'*': True},
+
+            # Or explicitly set permissions.
+            dict.fromkeys(permissions, True),
+            ],
+        }
+
     if not user_db.permissions.find_one(spec):
 
         # Hack for passing context data to PermissionDenied. May be
