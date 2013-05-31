@@ -1,5 +1,6 @@
 import json
 
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -14,6 +15,7 @@ from ..forms.person import EditForm
 from ...models.paginators import CursorPaginator
 from ...models.utils import get_id, generate_id
 from ...models.base import _PrettyPrintEncoder
+from ..permissions import check_permissions, permission_required
 from .base import RestrictedView
 
 
@@ -25,6 +27,7 @@ class Edit(RestrictedView):
     def get(self, request, _id=None):
         if _id is not None:
             # Edit an existing object.
+            check_permissions(request, 'person.edit')
             _id = get_id(_id)
             person = self.collection.find_one(_id)
             context = dict(
@@ -33,10 +36,12 @@ class Edit(RestrictedView):
                 action='edit')
         else:
             # Create a new object.
+            check_permissions(request, 'person.create')
             context = dict(form=EditForm(), action='create')
         context['nav_active'] = 'person'
         return render(request, 'person/edit.html', context)
 
+    @permission_required('people', 'edit')
     def post(self, request, _id=None):
         form = EditForm(request.POST)
         if form.is_valid():
@@ -68,7 +73,6 @@ class Edit(RestrictedView):
             return render(request, 'person/edit.html', context)
 
 
-
 def listing(request):
     context = dict(nav_active='person')
     page = int(request.GET.get('page', 1))
@@ -79,6 +83,7 @@ def listing(request):
 
 @require_POST
 @login_required
+@permission_required('person', 'delete')
 def delete(request):
     '''Confirm delete.'''
     _id = request.POST.get('_id')
@@ -89,6 +94,7 @@ def delete(request):
 
 @require_POST
 @login_required
+@permission_required('person', 'delete')
 def really_delete(request):
     _id = request.POST.get('_id')
     _id = get_id(_id)
