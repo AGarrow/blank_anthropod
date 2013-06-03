@@ -21,7 +21,7 @@ from .base import RestrictedView
 class Edit(RestrictedView):
 
     collection = db.people
-    validator = larvae.people.Person
+    validator = larvae.person.Person
 
     def get(self, request, _id=None):
         if _id is not None:
