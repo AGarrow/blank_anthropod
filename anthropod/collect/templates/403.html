@@ -25,6 +25,7 @@ span.silly {
     <div class="ah-ah-ah">
       <h4>You need the following permissions to do that:</h4>
       <ul>
+        <li>ocd_id: {{request.anthropod_ocd_id}}</li>
         {% for permission in request.anthropod_permissions %}
           <li>{{permission}}</li>
         {% endfor %}
