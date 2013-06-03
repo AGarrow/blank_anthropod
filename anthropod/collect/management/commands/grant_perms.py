@@ -1,18 +1,17 @@
-from pprint import pformat
 from optparse import make_option
-from difflib import get_close_matches
 
 from django.core.management.base import BaseCommand
 
-from anthropod.core import db, user_db
+from anthropod.core import user_db
+from anthropod.collect.permissions import grant_permissions, revoke_permissions
 
 
 class Command(BaseCommand):
-    args = '<username1>[,<usernameN>] <permission1> <permission2> ...'
+    args = '<username1>[,<username2>] <permission1>[,<permission2>] <id1>[,<id2>]...'
     help = '''
-    Grant or revoke permissions for one or more users. Multiple
-    emails can be joined with a comma. Use --revoke to revoke
-    instead of grant.'''.strip('\n')
+    Grant or revoke one or more permissions for one or more usernames
+    for one or more ocd_ids. Use --revoke to revoke.
+    '''.strip('\n')
 
     can_import_settings = True
 
@@ -24,46 +23,24 @@ class Command(BaseCommand):
         help='Revoke permissions instead of granting them.'),
     )
 
-    def handle(self, usernames, *permissions, **options):
+    def handle(self, usernames, ocd_ids, permissions, **options):
 
         # Granting or revoking?
         if options['revoke']:
-            verb = 'revoke'
-            action = '$unset'
+            self.revoke(usernames, ocd_ids, permissions.split(','))
         else:
-            verb = 'grant'
-            action = '$set'
+            self.grant(usernames, ocd_ids, permissions.split(','))
 
-
-        # Complain if the collection name is mistyped.
-        collection_names = db.collection_names()
-        collection_names.remove('system.indexes')
-        for permission in permissions:
-            if permission == 'all':
-                continue
-            collection_name, operation = permission.split('.')
-            if collection_name not in collection_names:
-                suggestions = get_close_matches(collection_name, collection_names)
-                suggestions = suggestions or collection_names
-                suggestions = map(repr, suggestions)
-                msg = ("Can't %s permissions on collection %r; "
-                       "there is no such collection. Maybe you meant %s?")
-                args = (verb, collection_name, ' or '.join(suggestions))
-                raise ValueError(msg % args)
-
-        # Update the mongo permissions collection.
-        permissions = dict.fromkeys(permissions, True)
-        document = {action: permissions}
+    def grant(self, usernames, ocd_ids, permissions):
         for username in usernames.split(','):
-            spec = {'user_id': username}
-            msg = '%s user %r these permissions: %r'
-            self.stdout.write(msg % (verb.title(), username, permissions))
+            for ocd_id in ocd_ids.split(','):
+                msg = 'Granting permissions: %r'
+                self.stdout.write(msg % [username, ocd_id, permissions])
+                grant_permissions(username, ocd_id, *permissions)
 
-            user_db.permissions.update(spec, document, upsert=True, multi=True)
-
-            # Show the new permissions.
-            new_perms = user_db.permissions.find_one(spec)
-            map(new_perms.pop, ('_id', 'user_id'))
-            msg = "Permissions for %s now are:\n%s"
-            msg = msg % (username, pformat(new_perms))
-            self.stdout.write(msg, ending='\n\n')
+    def revoke(self, usernames, ocd_ids, permissions):
+        for username in usernames.split(','):
+            for ocd_id in ocd_ids.split(','):
+                msg = 'Revoking permissions: %r'
+                self.stdout.write(msg % [username, ocd_id, permissions])
+                revoke_permissions(username, ocd_id, *permissions)
