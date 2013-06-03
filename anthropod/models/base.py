@@ -3,7 +3,6 @@ import json
 from bson.objectid import ObjectId
 
 from anthropod.core import _model_registry, _model_registry_by_collection
-from anthropod.models.utils import get_id
 
 
 class ModelMeta(type):
