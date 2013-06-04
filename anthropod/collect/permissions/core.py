@@ -20,9 +20,11 @@ def check_permissions(request, ocd_id, *permissions):
 
     spec = {
         'username': request.user.username,
-        'ocd_id': ocd_id,
         'permissions': {'$all': permissions},
         }
+
+    if ocd_id is not None:
+        spec.update(ocd_id=ocd_id)
 
     if not user_db.permissions.find_one(spec):
 
@@ -49,10 +51,9 @@ def grant_permissions(username, ocd_id, *permissions):
 
 
 def revoke_permissions(username, ocd_id, *permissions):
-    spec = {
-        'username': username,
-        'ocd_id': ocd_id,
-        }
+    spec = dict(username=username)
+    if ocd_id is not None:
+        spec.update(ocd_id=ocd_id)
     document = {
         '$pullAll': {'permissions': permissions}
         }
