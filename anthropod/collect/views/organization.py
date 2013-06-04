@@ -16,6 +16,7 @@ from ...models.utils import generate_id
 from ..forms.organization import EditForm
 from ..permissions import check_permissions
 from .base import RestrictedView
+from .utils import log_change
 
 
 def create(self):
@@ -50,14 +51,16 @@ class Edit(RestrictedView):
             obj = form.as_popolo(request)
 
             if _id is not None:
-                self.check_permissions(request, _id, 'organizations.edit')
+                action = 'organizations.edit'
+                self.check_permissions(request, _id, action)
                 # Apply the form changes to the existing object.
                 existing_obj = self.collection.find_one(_id)
                 existing_obj.update(obj)
                 obj = existing_obj
                 msg = 'Successfully edited organization named %(name)s.'
             else:
-                self.check_permissions(request, _id, 'organizations.create')
+                action = 'organizations.create'
+                self.check_permissions(request, _id, action)
                 obj['_id'] = generate_id('organization')
                 msg = 'Successfully created new organization named %(name)s.'
 
@@ -69,6 +72,7 @@ class Edit(RestrictedView):
 
             # Save.
             _id = self.collection.save(obj)
+            self.log_change(request, _id, action)
             messages.success(request, msg % obj)
             return redirect('organization.jsonview', _id=_id)
         else:
@@ -106,10 +110,12 @@ def delete(request):
 @login_required
 def really_delete(request):
     _id = request.POST.get('_id')
-    check_permissions(request, _id, 'organizations.delete')
+    action = 'organizations.delete'
+    check_permissions(request, _id, action)
     obj = db.organizations.find_one(_id)
     db.memberships.remove(dict(organization_id=obj.id))
     db.organizations.remove(_id)
+    log_change(request, _id, action)
     msg = 'Deleted obj %r with id %r.'
     messages.success(request, msg % (obj['name'], _id))
     return redirect(reverse('organization.list'))

@@ -1,6 +1,9 @@
 from urllib import urlencode
+from datetime import datetime
 
 from django.core.urlresolvers import reverse
+
+from anthropod.core import db
 
 
 def reverse_params(*args, **kwargs):
@@ -10,3 +13,15 @@ def reverse_params(*args, **kwargs):
     '''
     params = kwargs.pop('params')
     return reverse(*args, **kwargs) + '?' + urlencode(params)
+
+
+def log_change(request, _id, action):
+    '''Super simple change logging.
+    '''
+    username = request.user.username
+    change = dict(
+        username=username,
+        record_id=_id,
+        action=action,
+        datetime=datetime.utcnow())
+    db.changes.save(change)

@@ -9,6 +9,7 @@ import larvae.membership
 from ...core import db
 from ..permissions import check_permissions
 from .base import RestrictedView
+from .utils import log_change
 
 
 def listing(request, _id):
@@ -61,7 +62,8 @@ class SelectOrg(RestrictedView):
     def post(self, request):
         org_ids = request.POST.getlist('org_id')
         person_id = request.POST['person_id']
-        self.check_permissions(request, person_id, 'memberships.create')
+        action = 'memberships.create'
+        self.check_permissions(request, person_id, action)
         for org_id in org_ids:
             membership = self.validator(
                 person_id=person_id,
@@ -69,7 +71,7 @@ class SelectOrg(RestrictedView):
             membership.validate()
             obj = membership.as_dict()
             self.collection.save(obj)
-        # Create membership here.
+            self.log_change(request, _id, action)
         messages.info(request, 'Created %d new memberships.' % len(org_ids))
         return redirect('person.memb.listing', _id=person_id)
 
@@ -91,12 +93,14 @@ def delete(request):
 def really_delete(request):
     # Get the membership id.
     _id = request.POST.get('_id')
-    check_permissions(request, _id, 'memberships.delete')
+    action = 'memberships.delete'
+    check_permissions(request, _id, action)
 
     obj = db.memberships.find_one(_id)
     vals = (obj.person().display(), obj.organization().display())
     msg = "Deleted %s's membership in %s."
     kwargs = dict(_id=obj.person().id)
     db.memberships.remove(_id)
+    log_change(request, _id, action)
     messages.info(request, msg % vals)
     return redirect(reverse('person.jsonview', kwargs=kwargs))

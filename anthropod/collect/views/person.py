@@ -16,6 +16,7 @@ from ...models.utils import generate_id
 from ...models.base import _PrettyPrintEncoder
 from ..permissions import check_permissions
 from .base import RestrictedView
+from .utils import log_change
 
 
 class Edit(RestrictedView):
@@ -47,7 +48,8 @@ class Edit(RestrictedView):
             obj = form.as_popolo(request)
 
             if _id is not None:
-                self.check_permissions(request, _id, 'people.edit')
+                action = 'people.edit'
+                self.check_permissions(request, _id, action)
 
                 # Apply the form changes to the existing object.
                 existing_obj = self.collection.find_one(_id)
@@ -55,7 +57,8 @@ class Edit(RestrictedView):
                 obj = existing_obj
                 msg = 'Successfully updated person named %(name)s.'
             else:
-                self.check_permissions(request, _id, 'people.create')
+                action = 'people.create'
+                self.check_permissions(request, _id, action)
 
                 obj['_id'] = generate_id('person')
                 msg = 'Successfully created new person named %(name)s.'
@@ -68,6 +71,7 @@ class Edit(RestrictedView):
 
             # Save.
             _id = self.collection.save(obj)
+            self.log_change(request, _id, action)
             messages.info(request, msg % obj)
             return redirect('person.jsonview', _id=_id)
         else:
@@ -99,10 +103,12 @@ def delete(request):
 @login_required
 def really_delete(request):
     _id = request.POST.get('_id')
-    check_permissions(request, _id, 'people.delete')
+    action = 'people.delete'
+    check_permissions(request, _id, action)
     person = db.people.find_one(_id)
     db.memberships.remove(dict(person_id=person.id))
     db.people.remove(_id)
+    log_change(request, _id, action)
     msg = 'Deleted person %r with id %r.'
     messages.info(request, msg % (person['name'], _id))
     return redirect('person.listing')

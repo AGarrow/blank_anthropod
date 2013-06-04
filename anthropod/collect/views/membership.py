@@ -10,6 +10,7 @@ from ...core import db
 from ..forms.memb import EditForm
 from ..permissions import check_permissions
 from .base import RestrictedView
+from .utils import log_change
 
 
 class Edit(RestrictedView):
@@ -41,7 +42,8 @@ class Edit(RestrictedView):
             obj = form.as_popolo(request)
 
             if _id is not None:
-                check_permissions(request, _id, 'memberships.edit')
+                action = 'memberships.edit'
+                check_permissions(request, _id, action)
 
                 # Apply the form changes to the existing object.
                 existing_obj = self.collection.find_one(_id)
@@ -49,7 +51,8 @@ class Edit(RestrictedView):
                 obj = existing_obj
                 msg = "Successfully edited %s's membership in %s."
             else:
-                check_permissions(request, _id, 'memberships.create')
+                action = 'memberships.create'
+                check_permissions(request, _id, action)
 
                 msg = "Successfully created %s's membership in %s."
 
@@ -63,6 +66,7 @@ class Edit(RestrictedView):
 
             # Save.
             _id = self.collection.save(obj)
+            self.log_change(request, _id, action)
             messages.success(request, msg % msg_args)
             return redirect('memb.jsonview', _id=_id)
         else:
