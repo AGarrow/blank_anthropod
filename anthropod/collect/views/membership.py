@@ -7,9 +7,8 @@ from django.contrib.auth.decorators import login_required
 import larvae.membership
 
 from ...core import db
-from ...models.utils import get_id
 from ..forms.memb import EditForm
-from ..permissions import check_permissions, permission_required
+from ..permissions import check_permissions
 from .base import RestrictedView
 
 
@@ -20,17 +19,16 @@ class Edit(RestrictedView):
 
     def get(self, request, _id=None):
         if _id is not None:
-            check_permissions(request, 'memberships.edit')
+            check_permissions(request, _id, 'memberships.edit')
 
             # Edit an existing object.
-            _id = get_id(_id)
             obj = self.collection.find_one(_id)
             context = dict(
                 obj=obj,
                 form=EditForm.from_popolo(obj),
                 action='edit')
         else:
-            check_permissions(request, 'memberships.create')
+            check_permissions(request, _id, 'memberships.create')
 
             # Create a new object.
             context = dict(form=EditForm(), action='create')
@@ -43,16 +41,15 @@ class Edit(RestrictedView):
             obj = form.as_popolo(request)
 
             if _id is not None:
-                check_permissions(request, 'memberships.edit')
+                check_permissions(request, _id, 'memberships.edit')
 
                 # Apply the form changes to the existing object.
-                _id = get_id(_id)
                 existing_obj = self.collection.find_one(_id)
                 existing_obj.update(obj)
                 obj = existing_obj
                 msg = "Successfully edited %s's membership in %s."
             else:
-                check_permissions(request, 'memberships.create')
+                check_permissions(request, _id, 'memberships.create')
 
                 msg = "Successfully created %s's membership in %s."
 
@@ -74,7 +71,6 @@ class Edit(RestrictedView):
 
 
 def jsonview(request, _id):
-    _id = get_id(_id)
     obj = db.memberships.find_one(_id)
     context = dict(obj=obj, nav_active='memb')
     return render(request, 'memb/jsonview.html', context)
@@ -82,6 +78,5 @@ def jsonview(request, _id):
 
 @require_POST
 @login_required
-@permission_required('memberships.delete')
 def delete(request, _id):
     raise NotImplemented

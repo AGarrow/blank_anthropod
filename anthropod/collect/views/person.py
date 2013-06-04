@@ -12,9 +12,9 @@ import larvae.membership
 from ...core import db
 from ..forms.person import EditForm
 from ...models.paginators import CursorPaginator
-from ...models.utils import get_id, generate_id
+from ...models.utils import generate_id
 from ...models.base import _PrettyPrintEncoder
-from ..permissions import permission_required
+from ..permissions import check_permissions
 from .base import RestrictedView
 
 
@@ -25,17 +25,16 @@ class Edit(RestrictedView):
 
     def get(self, request, _id=None):
         if _id is not None:
-            self.check_permissions(request, 'people.edit')
+            self.check_permissions(request, _id, 'people.edit')
 
             # Edit an existing object.
-            _id = get_id(_id)
             person = self.collection.find_one(_id)
             context = dict(
                 person=person,
                 form=EditForm.from_popolo(person),
                 action='edit')
         else:
-            self.check_permissions(request, 'people.create')
+            self.check_permissions(request, _id, 'people.create')
 
             # Create a new object.
             context = dict(form=EditForm(), action='create')
@@ -48,7 +47,7 @@ class Edit(RestrictedView):
             obj = form.as_popolo(request)
 
             if _id is not None:
-                self.check_permissions(request, 'people.edit')
+                self.check_permissions(request, _id, 'people.edit')
 
                 # Apply the form changes to the existing object.
                 existing_obj = self.collection.find_one(_id)
@@ -56,7 +55,7 @@ class Edit(RestrictedView):
                 obj = existing_obj
                 msg = 'Successfully updated person named %(name)s.'
             else:
-                self.check_permissions(request, 'people.create')
+                self.check_permissions(request, _id, 'people.create')
 
                 obj['_id'] = generate_id('person')
                 msg = 'Successfully created new person named %(name)s.'
@@ -87,21 +86,20 @@ def listing(request):
 
 @require_POST
 @login_required
-@permission_required('people.delete')
 def delete(request):
     '''Confirm delete.'''
     _id = request.POST.get('_id')
     person = db.people.find_one(_id)
+    check_permissions(request, _id, 'people.delete')
     context = dict(person=person, nav_active='person')
     return render(request, 'person/confirm_delete.html', context)
 
 
 @require_POST
 @login_required
-@permission_required('people.delete')
 def really_delete(request):
     _id = request.POST.get('_id')
-    _id = get_id(_id)
+    check_permissions(request, _id, 'people.delete')
     person = db.people.find_one(_id)
     db.memberships.remove(dict(person_id=person.id))
     db.people.remove(_id)

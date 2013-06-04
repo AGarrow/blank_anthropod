@@ -7,8 +7,7 @@ from django.contrib.auth.decorators import login_required
 import larvae.membership
 
 from ...core import db
-from ...models.utils import get_id
-from ..permissions import check_permissions, permission_required
+from ..permissions import check_permissions
 from .base import RestrictedView
 
 
@@ -26,14 +25,14 @@ class SelectGeo(RestrictedView):
     for this person.
     '''
     def get(self, request):
-        self.check_permissions(request, 'memberships.create')
+        self.check_permissions(request, None, 'memberships.create')
         context = dict(
             person_id=request.GET['person_id'],
             nav_active='person')
         return render(request, 'person/memb/select_geo.html', context)
 
     def post(self, request, person_id):
-        self.check_permissions(request, 'memberships.create')
+        self.check_permissions(request, person_id, 'memberships.create')
         _id = request.POST.get('id')
         url_kwargs = dict(geo_id=_id, person_id=person_id)
         return redirect('person.memb.add.org', **url_kwargs)
@@ -50,7 +49,7 @@ class SelectOrg(RestrictedView):
         '''The geo_id is named `id` because we're reusing the geo select
         template for the referer page.
         '''
-        self.check_permissions(request, 'memberships.create')
+        self.check_permissions(request, None, 'memberships.create')
         person_id = request.GET['person_id']
         geo_id = request.GET['id']
         context = dict(
@@ -60,9 +59,9 @@ class SelectOrg(RestrictedView):
         return render(request, 'person/memb/select_org.html', context)
 
     def post(self, request):
-        self.check_permissions(request, 'memberships.create')
         org_ids = request.POST.getlist('org_id')
         person_id = request.POST['person_id']
+        self.check_permissions(request, person_id, 'memberships.create')
         for org_id in org_ids:
             membership = self.validator(
                 person_id=person_id,
@@ -77,12 +76,11 @@ class SelectOrg(RestrictedView):
 
 @require_POST
 @login_required
-@permission_required('memberships.delete')
 def delete(request):
     '''Confirm delete.'''
     # Get the membership id.
     _id = request.POST.get('_id')
-    _id = get_id(_id)
+    check_permissions(request, _id, 'memberships.delete')
     memb = db.memberships.find_one(_id)
     context = dict(memb=memb, nav_active='person')
     return render(request, 'person/memb/confirm_delete.html', context)
@@ -90,11 +88,10 @@ def delete(request):
 
 @require_POST
 @login_required
-@permission_required('memberships.delete')
 def really_delete(request):
     # Get the membership id.
     _id = request.POST.get('_id')
-    _id = get_id(_id)
+    check_permissions(request, _id, 'memberships.delete')
 
     obj = db.memberships.find_one(_id)
     vals = (obj.person().display(), obj.organization().display())

@@ -1,7 +1,6 @@
 import json
 
 from django.http import HttpResponse
-from django.views.generic.base import View
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
@@ -13,9 +12,9 @@ import larvae.organization
 from ...core import db
 from ...models.paginators import CursorPaginator
 from ...models.base import _PrettyPrintEncoder
-from ...models.utils import get_id, generate_id
+from ...models.utils import generate_id
 from ..forms.organization import EditForm
-from ..permissions import permission_required
+from ..permissions import check_permissions
 from .base import RestrictedView
 
 
@@ -30,16 +29,15 @@ class Edit(RestrictedView):
 
     def get(self, request, geo_id=None, _id=None):
         if _id is not None:
-            self.check_permissions(request, 'organizations.edit')
+            self.check_permissions(request, _id, 'organizations.edit')
             # Edit an existing object.
-            _id = get_id(_id)
             obj = self.collection.find_one(_id)
             context = dict(
                 obj=obj,
                 form=EditForm.from_popolo(obj),
                 action='edit')
         else:
-            self.check_permissions(request, 'organizations.create')
+            self.check_permissions(request, _id, 'organizations.create')
             # Create a new object.
             form = EditForm(initial=dict(geography_id=geo_id))
             context = dict(form=form, action='create')
@@ -52,15 +50,14 @@ class Edit(RestrictedView):
             obj = form.as_popolo(request)
 
             if _id is not None:
-                self.check_permissions(request, 'organizations.edit')
+                self.check_permissions(request, _id, 'organizations.edit')
                 # Apply the form changes to the existing object.
-                _id = get_id(_id)
                 existing_obj = self.collection.find_one(_id)
                 existing_obj.update(obj)
                 obj = existing_obj
                 msg = 'Successfully edited organization named %(name)s.'
             else:
-                self.check_permissions(request, 'organizations.create')
+                self.check_permissions(request, _id, 'organizations.create')
                 obj['_id'] = generate_id('organization')
                 msg = 'Successfully created new organization named %(name)s.'
 
@@ -81,7 +78,6 @@ class Edit(RestrictedView):
 
 
 def jsonview(request, _id):
-    _id = get_id(_id)
     obj = db.organizations.find_one(_id)
     context = dict(obj=obj, nav_active='org')
     return render(request, 'organization/jsonview.html', context)
@@ -97,11 +93,10 @@ def listing(request):
 
 @require_POST
 @login_required
-@permission_required('organizations.delete')
 def delete(request):
     '''Confirm delete.'''
     _id = request.POST.get('_id')
-    _id = get_id(_id)
+    check_permissions(request, _id, 'organizations.delete')
     obj = db.organizations.find_one(_id)
     context = dict(obj=obj, nav_active='org')
     return render(request, 'organization/confirm_delete.html', context)
@@ -109,10 +104,9 @@ def delete(request):
 
 @require_POST
 @login_required
-@permission_required('organizations.delete')
 def really_delete(request):
     _id = request.POST.get('_id')
-    _id = get_id(_id)
+    check_permissions(request, _id, 'organizations.delete')
     obj = db.organizations.find_one(_id)
     db.memberships.remove(dict(organization_id=obj.id))
     db.organizations.remove(_id)
