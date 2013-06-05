@@ -20,10 +20,13 @@ class Edit(RestrictedView):
 
     def get(self, request, _id=None):
         if _id is not None:
-            check_permissions(request, _id, 'memberships.edit')
-
             # Edit an existing object.
             obj = self.collection.find_one(_id)
+
+            self.any_permissions(request, [
+                (obj['organization_id'], ['organizations.edit']),
+                (obj['person_id'], ['people.edit'])])
+
             context = dict(
                 obj=obj,
                 form=EditForm.from_popolo(obj),

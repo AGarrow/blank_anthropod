@@ -26,14 +26,12 @@ class SelectGeo(RestrictedView):
     for this person.
     '''
     def get(self, request):
-        self.check_permissions(request, None, 'memberships.create')
         context = dict(
             person_id=request.GET['person_id'],
             nav_active='person')
         return render(request, 'person/memb/select_geo.html', context)
 
     def post(self, request, person_id):
-        self.check_permissions(request, person_id, 'memberships.create')
         _id = request.POST.get('id')
         url_kwargs = dict(geo_id=_id, person_id=person_id)
         return redirect('person.memb.add.org', **url_kwargs)
@@ -50,7 +48,6 @@ class SelectOrg(RestrictedView):
         '''The geo_id is named `id` because we're reusing the geo select
         template for the referer page.
         '''
-        self.check_permissions(request, None, 'memberships.create')
         person_id = request.GET['person_id']
         geo_id = request.GET['id']
         context = dict(
@@ -62,16 +59,15 @@ class SelectOrg(RestrictedView):
     def post(self, request):
         org_ids = request.POST.getlist('org_id')
         person_id = request.POST['person_id']
-        action = 'memberships.create'
-        self.check_permissions(request, person_id, action)
+        self.check_permissions(request, person_id, 'people.edit')
         for org_id in org_ids:
             membership = self.validator(
                 person_id=person_id,
                 organization_id=org_id)
             membership.validate()
             obj = membership.as_dict()
-            self.collection.save(obj)
-            self.log_change(request, _id, action)
+            membership_id = self.collection.save(obj)
+            self.log_change(request, membership_id, 'membership.create')
         messages.info(request, 'Created %d new memberships.' % len(org_ids))
         return redirect('person.memb.listing', _id=person_id)
 
@@ -82,9 +78,9 @@ def delete(request):
     '''Confirm delete.'''
     # Get the membership id.
     _id = request.POST.get('_id')
-    check_permissions(request, _id, 'memberships.delete')
-    memb = db.memberships.find_one(_id)
-    context = dict(memb=memb, nav_active='person')
+    obj = db.memberships.find_one(_id)
+    check_permissions(request, obj['person_id'], 'people.edit')
+    context = dict(memb=obj, nav_active='person')
     return render(request, 'person/memb/confirm_delete.html', context)
 
 
@@ -93,14 +89,13 @@ def delete(request):
 def really_delete(request):
     # Get the membership id.
     _id = request.POST.get('_id')
-    action = 'memberships.delete'
-    check_permissions(request, _id, action)
 
     obj = db.memberships.find_one(_id)
+    check_permissions(request, obj['person_id'], 'people.edit')
     vals = (obj.person().display(), obj.organization().display())
     msg = "Deleted %s's membership in %s."
     kwargs = dict(_id=obj.person().id)
     db.memberships.remove(_id)
-    log_change(request, _id, action)
+    log_change(request, _id, 'memberships.delete')
     messages.info(request, msg % vals)
     return redirect(reverse('person.jsonview', kwargs=kwargs))

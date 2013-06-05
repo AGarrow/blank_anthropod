@@ -27,14 +27,14 @@ class SelectPerson(RestrictedView):
     validator = larvae.membership.Membership
 
     def get(self, request, org_id):
-        self.check_permissions(request, org_id, 'memberships.create')
+        self.check_permissions(request, org_id, 'organizations.edit')
         context = dict(nav_active='memb', org_id=org_id)
         return render(request, 'organization/memb/select_person.html', context)
 
     def post(self, request, org_id=None):
-        action = 'memberships.create'
-        self.check_permissions(request, org_id, action)
+        action = 'organizations.edit'
         person_ids = request.POST.getlist('person_id')
+        self.check_permissions(request, org_id, action)
         org_id = request.POST.get('org_id')
         for person_id in person_ids:
             membership = self.validator(
@@ -57,7 +57,7 @@ def delete(request):
     _id = request.POST.get('_id')
 
     memb = db.memberships.find_one(_id)
-    check_permissions(request, memb['organization_id'], 'memberships.delete')
+    check_permissions(request, memb['organization_id'], 'organizations.edit')
     context = dict(memb=memb, nav_active='org')
     return render(request, 'organization/memb/confirm_delete.html', context)
 
@@ -67,10 +67,10 @@ def delete(request):
 def really_delete(request):
     # Get the membership id.
     _id = request.POST.get('_id')
-    action = 'memberships.delete'
-    check_permissions(request, _id, action)
-
     obj = db.memberships.find_one(_id)
+
+    action = 'organizations.edit'
+    check_permissions(request, obj['organization_id'], action)
     vals = (obj.person().display(), obj.organization().display())
     msg = "Deleted %s's membership in %r." % vals
     kwargs = dict(_id=obj.organization().id)
