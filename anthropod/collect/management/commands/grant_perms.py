@@ -2,7 +2,7 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand
 
-from anthropod.core import db, user_db
+from anthropod.core import db
 from anthropod.collect.permissions import grant_permissions, revoke_permissions
 
 
@@ -39,13 +39,16 @@ class Command(BaseCommand):
             self.grant(usernames, ocd_ids, permissions)
 
     def check_usernames(self, usernames):
+        '''Complain if usernames don't look like email addresses.
+        '''
         for username in usernames.split(','):
             if '@' not in username:
                 msg = 'Usernames should be email addresses, not %r.'
                 raise ValueError(msg % username)
 
     def check_collection_names(self, permissions):
-        # Complain if the collection name is mistyped.
+        '''Complain if the collection name is mistyped.
+        '''
         for permission in permissions:
             collection_name, operation = permission.split('.')
             if collection_name not in self.collection_names:
@@ -73,7 +76,6 @@ class Command(BaseCommand):
                 self.stdout.write(msg % [username, ocd_ids, permissions])
                 revoke_permissions(username, ocd_ids, *permissions)
                 return
-
             for ocd_id in ocd_ids.split(','):
                 self.stdout.write(msg % [username, ocd_id, permissions])
                 revoke_permissions(username, ocd_id, *permissions)
