@@ -16,7 +16,7 @@
   </div>
   {% endif %}
 
-  <form action="{% url 'person.really_delete' %}" method="POST">
+  <form action="{% url 'person.delete' %}" method="POST">
     {% csrf_token %}
     <input type="hidden" value="{{person.id}}" name="_id"></input>
     <button type="submit" class="btn btn-danger">

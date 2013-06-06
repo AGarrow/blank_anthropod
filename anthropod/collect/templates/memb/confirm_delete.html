@@ -3,7 +3,7 @@
 {% block memb_content %}
 <h2>{{memb.name}}</h2>
 
-  <form action="{% url 'organization.memb.really_delete' %}" method="POST">
+  <form action="{% url 'organization.memb.delete' %}" method="POST">
     {% csrf_token %}
     <input type="hidden" value="{{memb.id}}" name="_id"></input>
     <input type="hidden" value="{{memb.organization.id}}" name="_id"></input>

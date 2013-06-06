@@ -19,7 +19,7 @@ $(document).ready(function() {
 
 <div class="container">
   <h2 class="pull-left">{{obj.name}}</h2>
-  <form action="{% url 'memb.delete' obj.id %}" method="POST" class="pull-right">
+  <form action="{% url 'memb.delete' %}" method="POST" class="pull-right">
     {% csrf_token %}
     <input type="hidden" value="{{obj.id}}" name="_id"></input>
     <button type="submit" class="btn btn-danger" id="delete">

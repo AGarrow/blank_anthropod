@@ -3,7 +3,7 @@
 {% block memb_content %}
 <h2>{{memb.person.display}}'s membership in {{memb.organization.display}}.</h2>
 
-  <form action="{% url 'person.memb.really_delete' %}" method="POST">
+  <form action="{% url 'person.memb.delete' %}" method="POST">
     {% csrf_token %}
     <input type="hidden" value="{{memb.id}}" name="_id"></input>
     <input type="hidden" value="{{memb.person.id}}" name="person_id"></input>

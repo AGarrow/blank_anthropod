@@ -15,7 +15,7 @@
       </td>
       <td>{{memb.post_id}}</td>
       <td>
-        <form action="{% url 'person.memb.delete' %}" method="POST" class="inlineform pull-right item-delete">
+        <form action="{% url 'person.memb.confirm_delete' %}" method="POST" class="inlineform pull-right item-delete">
           {% csrf_token %}
           <input type="hidden" value="{{memb.id}}" name="_id"></input>
           <button type="submit" class="btn">
