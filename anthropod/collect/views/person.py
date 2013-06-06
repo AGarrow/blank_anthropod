@@ -90,8 +90,7 @@ def listing(request):
 
 @require_POST
 @login_required
-def delete(request):
-    '''Confirm delete.'''
+def confirm_delete(request):
     _id = request.POST.get('_id')
     person = db.people.find_one(_id)
     check_permissions(request, _id, 'people.delete')
@@ -101,7 +100,7 @@ def delete(request):
 
 @require_POST
 @login_required
-def really_delete(request):
+def delete(request):
     _id = request.POST.get('_id')
     action = 'people.delete'
     check_permissions(request, _id, action)

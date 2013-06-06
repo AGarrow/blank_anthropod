@@ -74,7 +74,7 @@ class SelectOrg(RestrictedView):
 
 @require_POST
 @login_required
-def delete(request):
+def confirm_delete(request):
     '''Confirm delete.'''
     # Get the membership id.
     _id = request.POST.get('_id')
@@ -86,7 +86,7 @@ def delete(request):
 
 @require_POST
 @login_required
-def really_delete(request):
+def delete(request):
     # Get the membership id.
     _id = request.POST.get('_id')
 
