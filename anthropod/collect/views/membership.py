@@ -3,12 +3,13 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 
 import larvae.membership
 
 from ...core import db
 from ..forms.memb import EditForm
-from ..permissions import check_permissions
+from ..permissions import check_permissions, any_permissions
 from .base import RestrictedView
 from .utils import log_change
 
@@ -85,5 +86,40 @@ def jsonview(request, _id):
 
 @require_POST
 @login_required
-def delete(request, _id):
-    raise NotImplemented
+def confirm_delete(request):
+    '''Confirm delete.'''
+    # Get the membership id.
+    _id = request.POST.get('_id')
+    obj = db.memberships.find_one(_id)
+
+    any_permissions(request, [
+        (obj['organization_id'], ['organizations.edit']),
+        (obj['person_id'], ['people.edit'])])
+
+    context = dict(memb=obj, nav_active='person')
+    return render(request, '/memb/confirm_delete.html', context)
+
+
+@require_POST
+@login_required
+def delete(request):
+    # Get the object.
+    _id = request.POST.get('_id')
+    obj = db.memberships.find_one(_id)
+
+    # Check permissions.
+    any_permissions(request, [
+        (obj['organization_id'], ['organizations.edit']),
+        (obj['person_id'], ['people.edit'])])
+
+    # Format a flash message.
+    vals = (obj.person().display(), obj.organization().display())
+    msg = "Deleted %s's membership in %s."
+    messages.info(request, msg % vals)
+
+    # Remove the object.
+    db.memberships.remove(_id)
+    log_change(request, _id, 'memberships.delete')
+
+    kwargs = dict(_id=obj.person().id)
+    return redirect(reverse('person.memb.listing', kwargs=kwargs))
