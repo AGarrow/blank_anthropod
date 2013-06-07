@@ -14,13 +14,13 @@
   <tbody>
   {% for field in form %}
     <tr>
-      <td>{{ field.label }}:</td>
+      {% if not field.field.widget.is_hidden %}
+        <td>{{ field.label }}:</td>
+      {% endif %}
       <td>
         {{ field }}
-        {% if field.field.required %}
-          <span style="color: red;">*</span>
-        {% endif %}
-       <span style="color: red;">{{ field.errors }}</span></td>
+        <span style="color: red;">{{ field.errors }}</span>
+      </td>
     </tr>
   {% endfor %}
   </tbody>

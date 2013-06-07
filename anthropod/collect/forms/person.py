@@ -39,6 +39,7 @@ class EditForm(BaseForm):
     alternate_name_note = forms.ChoiceField(
         choices=ALT_NAME_NOTE_CHOICES, required=False)
     alternate_name_name = forms.CharField(required=False)
+    org_id = forms.CharField(required=False, widget=forms.HiddenInput)
 
     def alternate_names(self, request):
         '''

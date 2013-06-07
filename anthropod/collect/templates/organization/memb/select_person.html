@@ -15,8 +15,18 @@ $(document).ready(function(){
 {% endblock extra_head %}
 
 {% block content %}
-<h1>Choose people to add to this organization</h1>
 <div class="container">
+<h2>Create a new member of this organization.</h2>
+  <form method="GET" action="{% url 'person.edit' %}">
+    <input type="hidden" name="org_id" value="{{org_id}}">
+    <div class="row-fluid">
+        {% csrf_token %}
+        <p><input type="submit" class="btn" value="Submit"></p>
+      </div>
+    </div>
+  </form>
+
+<h2>Choose existing people to add to this organization</h2>
   {% comment %}
   Note: the form needs "navbar-form" as a class in order for the
   typeahead plugin to play nicely with bootstrap's styles.
@@ -40,5 +50,4 @@ $(document).ready(function(){
     </div>
   </form>
 </div>
-
 {% endblock content %}
