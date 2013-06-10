@@ -41,7 +41,7 @@ urlpatterns += patterns('anthropod.collect.views.organization',
 
 urlpatterns += patterns('anthropod.collect.views.org_memb',
     url(r'^orgs/members/listing/(?P<_id>\S+?)/$', 'listing', name='org.memb.listing'),
-    url(r'^orgs/confirm_members/delete/$', 'confirm_delete', name='org.memb.confirm_delete'),
+    url(r'^orgs/members/confirm_delete/$', 'confirm_delete', name='org.memb.confirm_delete'),
     url(r'^orgs/members/delete/$', 'delete', name='org.memb.delete'),
     url(r'^orgs/members/select_person/(?P<org_id>\S+?)/$',
         org_memb.SelectPerson.as_view(), name='org.memb.add.person'),
