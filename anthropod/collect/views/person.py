@@ -12,13 +12,63 @@ import larvae.person
 import larvae.membership
 
 from ...core import db, user_db
+from ...utils import Cached
 from ..forms.person import EditForm
 from ...models.paginators import CursorPaginator
 from ...models.utils import generate_id
 from ...models.base import _PrettyPrintEncoder
-from ..permissions import check_permissions
+from ..permissions import PermissionChecker, check_permissions
 from .base import RestrictedView
 from .utils import log_change
+
+
+class PermissionChecker(PermissionChecker):
+
+    form_class = EditForm
+
+    def check_edit(self):
+        '''Complain unless the user can edit an organization
+        that this person is a member of.
+        '''
+        # Get ids of orgs this user can edit.
+        spec = {
+            'username': self.request.user.username,
+            'permissions': 'organizations.edit',
+            }
+        org_ids = user_db.permissions.find(spec).distinct('ocd_id')
+
+        # Check if this person_id is a member of any of those orgs.
+        spec = {
+            'person_id': self.form.data['_id'],
+            'organization_id': {'$in': org_ids}
+            }
+
+        # Complain if not.
+        if not db.memberships.find_one(spec):
+            raise self.PermissionDenied
+
+    def check_create_member(self):
+        '''Complain unless the user can edit the passed in org_id.
+        '''
+        org_id = self.form.data['org_id']
+        spec = {
+            'username': self.request.user.username,
+            'permissions': 'organizations.edit',
+            'ocd_id': org_id
+            }
+        if not user_db.permissions.find_one(spec):
+            raise PermissionDenied
+
+    def check_create(self):
+        '''Complain unless the user can create people.
+        '''
+        spec = {
+            'username': self.request.user.username,
+            'permissions': 'people.create',
+            'ocd_id': None
+            }
+        if not user_db.permissions.find_one(spec):
+            raise PermissionDenied
 
 
 class Edit(RestrictedView):
@@ -30,56 +80,10 @@ class Edit(RestrictedView):
     '''
     collection = db.people
     validator = larvae.person.Person
+    form_class = EditForm
 
     #-------------------------------------------------------------------------
-    # Permissions.
-    #-------------------------------------------------------------------------
-    def check_edit_permissions(self):
-        '''Complain unless the user can edit an organization
-        that this person is a member of.
-        '''
-        # Get ids of orgs this user can edit.
-        spec = {
-            'username': self.request.user.username,
-            'permissions': 'organizations.edit',
-            }
-        org_ids = user_db.permissions.find(spec).distinct('ocd_id')
-
-        # Check it this person_id is a member of any of those orgs.
-        spec = {
-            'person_id': self.kwargs['_id'],
-            'organization_id': {'$in': org_ids}
-            }
-
-        # Complain if not.
-        if not db.memberships.find_one(spec):
-            raise PermissionDenied
-
-    def check_create_member_permissions(self):
-        '''Complain unless the user can edit the passed in org_id.
-        '''
-        org_id = self.request.GET['org_id']
-        spec = {
-            'username': self.request.user.username,
-            'permissions': 'organizations.edit',
-            'ocd_id': org_id
-            }
-        if not user_db.permissions.find_one(spec):
-            raise PermissionDenied
-
-    def check_create_permissions(self):
-        '''Complain unless the user can create people.
-        '''
-        spec = {
-            'username': self.request.user.username,
-            'permissions': 'people.create',
-            'ocd_id': None
-            }
-        if not user_db.permissions.find_one(spec):
-            raise PermissionDenied
-
-    #-------------------------------------------------------------------------
-    # Get requests return an edit form.
+    # GET requests will return an edit form.
     #-------------------------------------------------------------------------
     def get(self, *args, **kwargs):
         '''Depending on the args supplied, either edit an existing
@@ -88,21 +92,21 @@ class Edit(RestrictedView):
         '''
         # If a person_id is given, edit an existing person.
         if '_id' in self.request.GET:
-            return self.edit_existing()
+            return self.get_edit_existing()
 
         # If an org_id is given, create a new person and make
         # the person a member of that org.
         elif 'org_id' in self.request.GET:
-            return self.create_member()
+            return self.get_create_member()
 
         # Else, we're just creating a new person with no association
         # with an org.
         else:
-            return self.create()
+            return self.get_create()
 
-    def edit_existing(self):
-        self.check_edit_permissions()
-        _id = self.kwargs['_id']
+    def get_edit_existing(self):
+        self.permission_checker.check_edit()
+        _id = self.form.data['_id']
         person = self.collection.find_one(_id)
         context = dict(
             person=person,
@@ -111,8 +115,8 @@ class Edit(RestrictedView):
         context['nav_active'] = 'person'
         return render(self.request, 'person/edit.html', context)
 
-    def create_member(self):
-        self.check_create_member_permissions()
+    def get_create_member(self):
+        self.permission_checker.check_create_member()
         org_id = self.request.GET['org_id']
         initial = dict(org_id=org_id)
         context = dict(
@@ -123,48 +127,119 @@ class Edit(RestrictedView):
         # import pdb; pdb.set_trace()
         return render(self.request, 'person/edit.html', context)
 
-    def create(self):
-        self.check_create_permissions()
+    def get_create(self):
+        self.permission_checker.check_create()
         context = dict(form=EditForm(), action='create', nav_active='person')
-        return render(request, 'person/edit.html', context)
+        return render(self.request, 'person/edit.html', context)
 
     #-------------------------------------------------------------------------
-    # Get requests can edit existing or create a new person or member.
+    # POST requests can edit existing or create a new person or member.
     #-------------------------------------------------------------------------
     def post(self, *args, **kwargs):
-        form = EditForm(request.POST)
-        if form.is_valid():
-            obj = form.as_popolo(request)
+        if self.form.is_valid():
+            # If a person_id is given, edit an existing person.
+            if '_id' in self.request.GET:
+                return self.post_edit_existing()
 
-            if _id is not None:
-                # Check permissions.
+            # If an org_id is given, create a new person and make
+            # the person a member of that org.
+            elif 'org_id' in self.request.GET:
+                return self.post_create_member()
 
-                # Apply the form changes to the existing object.
-                existing_obj = self.collection.find_one(_id)
-                existing_obj.update(obj)
-                obj = existing_obj
-                msg = 'Successfully updated person named %(name)s.'
+            # Else, we're just creating a new person with no association
+            # with an org.
             else:
-                # Check permissions.
+                return self.post_create()
 
-                obj['_id'] = generate_id('person')
-                msg = 'Successfully created new person named %(name)s.'
-
-            # Check for popolo compliance.
-            obj.pop('_type', None)
-            obj = self.validator(**obj)
-            obj.validate()
-            obj = obj.as_dict()
-
-            # Save.
-            _id = self.collection.save(obj)
-            self.log_change(request, _id, action)
-            messages.info(request, msg % obj)
-            return redirect('person.jsonview', _id=_id)
         else:
+            _id = self.form.data['_id']
             obj = self.collection.find_one(_id)
-            context = dict(form=form, obj=obj)
-            return render(request, 'person/edit.html', context)
+            context = dict(form=self.form, obj=obj)
+            return render(self.request, 'person/edit.html', context)
+
+    def obj_as_popolo(self, obj):
+        '''Check for popolo compliance.
+        '''
+        obj.pop('_type', None)
+        obj = self.validator(**obj)
+        obj.validate()
+        return obj.as_dict()
+
+    def post_edit_existing(self):
+        self.permission_checker.check_edit()
+        obj = self.form.as_popolo(self.request)
+        _id = self.form.data['_id']
+
+        # Apply the form changes to the existing object.
+        existing_obj = self.collection.find_one(_id)
+        existing_obj.update(obj)
+        obj = existing_obj
+        msg = 'Successfully updated person named %(name)s.'
+
+        # Validate and save.
+        obj = self.obj_as_popolo(obj)
+        _id = self.collection.save(obj)
+
+        messages.info(self.request, msg % obj)
+        self.log_change(self.request, _id, 'person.edit')
+        return redirect('person.jsonview', _id=_id)
+
+    def post_create_member(self, form):
+        '''Create a new person as a member of this organization.
+        '''
+        self.check_create_member()
+
+        obj = self.form.as_popolo(self.request)
+        obj['_id'] = generate_id('person')
+        msg = 'Successfully created new member named %(name)s.'
+
+        # Validate and save.
+        self.obj_as_popolo(obj)
+        _id = self.collection.save(obj)
+
+        self.log_change(request, _id, action)
+        messages.info(request, msg % obj)
+
+        # Add the membership.
+        obj = dict(
+            person_id=form.data['_id'],
+            organization_id=form.data['org_id'])
+
+        obj = larvae.membership.Membership(**obj)
+        obj.validate()
+        obj = obj.as_dict()
+
+        # Save.
+        _id = db.memberships.save(obj)
+        self.log_change(request, _id, action)
+        return redirect('person.jsonview', _id=_id)
+
+    def post_create(self):
+        self.check_create()
+
+        obj = self.form.as_popolo(self.request)
+        obj['_id'] = generate_id('person')
+        msg = 'Successfully created new person named %(name)s.'
+
+        # Validate and save.
+        self.validate_obj(obj)
+        obj = obj.as_dict()
+        _id = self.person(obj)
+        self.log_change(request, _id, action)
+        messages.info(request, msg % obj)
+        return redirect('person.jsonview', _id=_id)
+
+    #-------------------------------------------------------------------------
+    # Helpers
+    #-------------------------------------------------------------------------
+    @Cached
+    def form(self):
+        formdata = getattr(self.request, self.request.method)
+        return self.form_class(formdata)
+
+    @property
+    def permission_checker(self):
+        return PermissionChecker(self.request)
 
 
 def listing(request):
@@ -175,7 +250,6 @@ def listing(request):
     return render(request, 'person/listing.html', context)
 
 
-@require_POST
 @login_required
 def confirm_delete(request):
     _id = request.POST.get('_id')
