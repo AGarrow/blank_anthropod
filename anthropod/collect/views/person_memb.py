@@ -72,12 +72,11 @@ class SelectOrg(RestrictedView):
         return redirect('person.memb.listing', _id=person_id)
 
 
-@require_POST
 @login_required
 def confirm_delete(request):
     '''Confirm delete.'''
     # Get the membership id.
-    _id = request.POST.get('_id')
+    _id = request.GET['_id']
     obj = db.memberships.find_one(_id)
     check_permissions(request, obj['person_id'], 'people.edit')
     context = dict(memb=obj, nav_active='person')
