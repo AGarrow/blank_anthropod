@@ -95,11 +95,10 @@ def listing(request):
     return render(request, 'organization/list.html', context)
 
 
-@require_POST
 @login_required
 def confirm_delete(request):
     '''Confirm delete.'''
-    _id = request.POST.get('_id')
+    _id = request.GET['_id']
     check_permissions(request, _id, 'organizations.delete')
     obj = db.organizations.find_one(_id)
     context = dict(obj=obj, nav_active='org')
