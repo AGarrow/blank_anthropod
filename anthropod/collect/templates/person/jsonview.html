@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% block viewname %}&nbsp;/&nbsp;detail{% endblock %}
 {% block content %}
 
 <div class="container">
@@ -12,8 +11,9 @@
     </button>
   </form>
   <span class="pull-right">&nbsp;</span>
-  <form action="{% url 'person.edit' person.id %}" method="GET" class="pull-right">
+  <form action="{% url 'person.edit' %}" method="GET" class="pull-right">
     {% csrf_token %}
+    <input type="hidden" value="{{person.id}}" name="_id"></input>
     <button type="submit" class="btn btn-primary" id="edit">
       <i class="icon-pencil"></i>
     </button>

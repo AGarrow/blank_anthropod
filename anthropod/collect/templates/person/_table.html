@@ -1,3 +1,4 @@
+{% load customtags %}
 <table class="table table-keys" id="person-table">
   <thead>
     <tr>
@@ -11,17 +12,9 @@
       <td><a href="{% url 'person.jsonview' _id=person.id %}">{{person.name}}</td>
       <td>{{person.memberships.count}}</td>
       <td>
-        <form action="{% url 'person.delete' %}" method="POST" class="inlineform pull-right">
-          {% csrf_token %}
-          <input type="hidden" value="{{person.id}}" name="_id"></input>
-          <button type="submit" class="btn">
-            <i class="icon-remove"></i>
-          </button>
-        </form>
+{% button person 'person.confirm_delete' 'delete' %}
         <span class="pull-right">&nbsp;&nbsp;</span>
-        <a class="btn pull-right item-edit" href="{% url 'person.edit' person.id %}">
-          <i class="icon-pencil"></i>
-        </a>
+{% button person 'person.edit' 'edit' %}
       </td>
     </tr>
     {% endfor %}

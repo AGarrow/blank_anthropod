@@ -1,12 +1,10 @@
 {% extends "base.html" %}
+{% load customtags %}
 {% block extra_head %}
 <script>
 $(document).ready(function() {
   $(document).bind('keydown', 'd', function(){
     $("#delete").click();
-  });
-  $(document).bind('keydown', 'e', function(){
-    window.location = "{% url 'memb.edit' obj.id %}";
   });
 });
 </script>
@@ -19,20 +17,9 @@ $(document).ready(function() {
 
 <div class="container">
   <h2 class="pull-left">{{obj.name}}</h2>
-  <form action="{% url 'memb.delete' %}" method="POST" class="pull-right">
-    {% csrf_token %}
-    <input type="hidden" value="{{obj.id}}" name="_id"></input>
-    <button type="submit" class="btn btn-danger" id="delete">
-      <i class="icon-remove"></i>
-    </button>
-  </form>
+{% button obj 'memb.delete' 'delete' method='POST' %}
   <span class="pull-right">&nbsp;</span>
-  <form action="{% url 'memb.edit' _id=obj.id %}" method="GET" class="pull-right">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-primary">
-      <i class="icon-pencil"></i>
-    </button>
-  </form>
+{% button obj 'memb.edit' 'edit' %}
 </div>
 
 <h3>json</h3>

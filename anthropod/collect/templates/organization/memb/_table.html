@@ -1,3 +1,5 @@
+{% load customtags %}
+
 <table class="table table-keys" id="membership-table">
   <thead>
     <tr>
@@ -15,17 +17,9 @@
       </td>
       <td>{{memb.post_id}}</td>
       <td>
-        <form action="{% url 'org.memb.confirm_delete' %}" method="POST" class="inlineform pull-right item-delete">
-          {% csrf_token %}
-          <input type="hidden" value="{{memb.id}}" name="_id"></input>
-          <button type="submit" class="btn">
-            <i class="icon-remove"></i>
-          </button>
-        </form>
+{% button memb 'org.memb.confirm_delete' 'delete' %}
         <span class="pull-right">&nbsp;&nbsp;</span>
-        <a href="{% url 'memb.edit' memb.id %}" class="btn item-edit pull-right">
-          <i class="icon-edit"></i>
-        </form>
+{% button memb 'memb.edit' 'edit' %}
       </td>
     </tr>
     {% endfor %}
