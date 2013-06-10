@@ -17,7 +17,7 @@ from ..forms.person import EditForm
 from ...models.paginators import CursorPaginator
 from ...models.utils import generate_id
 from ...models.base import _PrettyPrintEncoder
-from ..permissions import PermissionChecker, check_permissions
+from ..permissions import PermissionChecker, check_permissions, check_admin
 from .base import RestrictedView
 from .utils import log_change
 
@@ -30,6 +30,8 @@ class PermissionChecker(PermissionChecker):
         '''Complain unless the user can edit an organization
         that this person is a member of.
         '''
+        if self.check_admin(self.request):
+            return
         # Get ids of orgs this user can edit.
         spec = {
             'username': self.request.user.username,
@@ -50,6 +52,8 @@ class PermissionChecker(PermissionChecker):
     def check_create_member(self):
         '''Complain unless the user can edit the passed in org_id.
         '''
+        if self.check_admin(self.request):
+            return
         org_id = self.form.data['org_id']
         spec = {
             'username': self.request.user.username,
@@ -62,6 +66,8 @@ class PermissionChecker(PermissionChecker):
     def check_create(self):
         '''Complain unless the user can create people.
         '''
+        if self.check_admin(self.request):
+            return
         spec = {
             'username': self.request.user.username,
             'permissions': 'people.create',
@@ -81,6 +87,7 @@ class Edit(RestrictedView):
     collection = db.people
     validator = larvae.person.Person
     form_class = EditForm
+    permission_checker_class = PermissionChecker
 
     #-------------------------------------------------------------------------
     # GET requests will return an edit form.
@@ -150,7 +157,6 @@ class Edit(RestrictedView):
             # with an org.
             else:
                 return self.post_create()
-
         else:
             _id = self.form.data['_id']
             obj = self.collection.find_one(_id)
@@ -184,26 +190,28 @@ class Edit(RestrictedView):
         self.log_change(self.request, _id, 'person.edit')
         return redirect('person.jsonview', _id=_id)
 
-    def post_create_member(self, form):
+    def post_create_member(self):
         '''Create a new person as a member of this organization.
         '''
-        self.check_create_member()
+        self.permission_checker.check_create_member()
 
         obj = self.form.as_popolo(self.request)
         obj['_id'] = generate_id('person')
         msg = 'Successfully created new member named %(name)s.'
 
         # Validate and save.
+        org_id = obj.pop('org_id')
         self.obj_as_popolo(obj)
-        _id = self.collection.save(obj)
+        person_id = self.collection.save(obj)
 
-        self.log_change(request, _id, action)
-        messages.info(request, msg % obj)
+        import pdb; pdb.set_trace()
+        self.log_change(self.request, person_id, 'person.create')
+        messages.info(self.request, msg % obj)
 
         # Add the membership.
         obj = dict(
-            person_id=form.data['_id'],
-            organization_id=form.data['org_id'])
+            person_id=person_id,
+            organization_id=org_id)
 
         obj = larvae.membership.Membership(**obj)
         obj.validate()
@@ -211,8 +219,8 @@ class Edit(RestrictedView):
 
         # Save.
         _id = db.memberships.save(obj)
-        self.log_change(request, _id, action)
-        return redirect('person.jsonview', _id=_id)
+        self.log_change(self.request, _id, 'membership.create')
+        return redirect('person.jsonview', _id=person_id)
 
     def post_create(self):
         self.check_create()
@@ -225,21 +233,9 @@ class Edit(RestrictedView):
         self.validate_obj(obj)
         obj = obj.as_dict()
         _id = self.person(obj)
-        self.log_change(request, _id, action)
-        messages.info(request, msg % obj)
+        self.log_change(self.request, _id, 'person.create')
+        messages.info(self.request, msg % obj)
         return redirect('person.jsonview', _id=_id)
-
-    #-------------------------------------------------------------------------
-    # Helpers
-    #-------------------------------------------------------------------------
-    @Cached
-    def form(self):
-        formdata = getattr(self.request, self.request.method)
-        return self.form_class(formdata)
-
-    @property
-    def permission_checker(self):
-        return PermissionChecker(self.request)
 
 
 def listing(request):
@@ -252,7 +248,7 @@ def listing(request):
 
 @login_required
 def confirm_delete(request):
-    _id = request.POST.get('_id')
+    _id = request.GET['_id']
     person = db.people.find_one(_id)
     check_permissions(request, _id, 'people.delete')
     context = dict(person=person, nav_active='person')
