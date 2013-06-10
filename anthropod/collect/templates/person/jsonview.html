@@ -1,23 +1,12 @@
 {% extends "base.html" %}
+{% load customtags %}
 {% block content %}
 
 <div class="container">
   <h2 class="pull-left">{{person.name}}</h2>
-  <form action="{% url 'person.delete' %}" method="POST" class="pull-right">
-    {% csrf_token %}
-    <input type="hidden" value="{{person.id}}" name="_id"></input>
-    <button type="submit" class="btn btn-danger" id="delete">
-      <i class="icon-remove"></i>
-    </button>
-  </form>
+{% button person 'person.confirm_delete' 'delete' %}
   <span class="pull-right">&nbsp;</span>
-  <form action="{% url 'person.edit' %}" method="GET" class="pull-right">
-    {% csrf_token %}
-    <input type="hidden" value="{{person.id}}" name="_id"></input>
-    <button type="submit" class="btn btn-primary" id="edit">
-      <i class="icon-pencil"></i>
-    </button>
-  </form>
+{% button person 'person.edit' 'edit' %}
 </div>
 
 <div>
