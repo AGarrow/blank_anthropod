@@ -1,0 +1,7 @@
+        <form action="{% url viewname %}" method="{{method}}" class="inlineform pull-right item-{{edit_or_delete}}">
+          {% if method != "GET" %}{% csrf_token %}{% endif %}
+          <input type="hidden" value="{{obj.id}}" name="_id"></input>
+          <button type="submit" class="btn">
+            <i class="{{icon}}"></i>
+          </button>
+        </form>
