@@ -21,10 +21,8 @@ def check_permissions(request, ocd_id, *permissions):
     '''Check whether the request.user has the specified permissions;
     if not, raise PermissionDenied.
     '''
-    # Skip permissions check for admins.
-    for _, email in settings.ADMINS:
-        if email == request.user.email:
-            return
+    if check_admin(request):
+        return True
 
     spec = {
         'username': request.user.username,
@@ -77,9 +75,9 @@ class PermissionChecker(object):
     '''
 
     # Make these accessible on the class.
-    check_permissions = check_permissions
-    check_admin = check_admin
-    PermissionDenied = PermissionDenied
+    check_permissions = staticmethod(check_permissions)
+    check_admin = staticmethod(check_admin)
+    PermissionDenied = staticmethod(PermissionDenied)
 
     # Subclasses set this--used in the `form` method below.
     form_class = None
@@ -91,3 +89,15 @@ class PermissionChecker(object):
     def form(self):
         formdata = getattr(self.request, self.request.method)
         return self.form_class(formdata)
+
+
+def grant_admin(username):
+    profile = user_db.profiles.find_one(username) or {'_id': username}
+    profile['is_admin'] = True
+    user_db.profiles.save(profile)
+
+
+def revoke_admin(username):
+    profile = user_db.profiles.find_one(username) or {'_id': username}
+    profile['is_admin'] = False
+    user_db.profiles.save(profile)
