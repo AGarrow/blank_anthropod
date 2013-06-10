@@ -16,12 +16,11 @@ class Command(BaseCommand):
     can_import_settings = True
 
     option_list = BaseCommand.option_list + (
-    make_option('--revoke',
-        action='store_true',
-        dest='revoke',
-        default=False,
-        help='Revoke permissions instead of granting them.'),
-    )
+        make_option('--revoke',
+            action='store_true',
+            dest='revoke',
+            default=False,
+            help='Revoke permissions instead of granting them.'),)
 
     collection_names = db.collection_names()
     collection_names.remove('system.indexes')
