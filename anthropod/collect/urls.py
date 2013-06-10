@@ -54,7 +54,7 @@ urlpatterns += patterns('anthropod.collect.views.geo',
 )
 
 urlpatterns += patterns('anthropod.collect.views.membership',
-    url(r'^memb/edit/(?P<_id>\S+?)$', membership.Edit.as_view(), name='memb.edit'),
+    url(r'^memb/edit/', membership.Edit.as_view(), name='memb.edit'),
     url(r'^memb/jsonview/(?P<_id>\S+?)$', 'jsonview', name='memb.jsonview'),
     url(r'^memb/confirm_delete/$', 'confirm_delete', name='memb.confirm_delete'),
     url(r'^memb/delete/$', 'delete', name='memb.delete'),
