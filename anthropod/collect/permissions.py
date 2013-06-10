@@ -17,36 +17,6 @@ def check_admin(request):
         return True
 
 
-def any_permissions(request, ocd_id_permissions):
-    '''If the user has any of the specified permissions, allow
-    the operation to continue, otherwise raise PermissionDenied.
-    '''
-    # Skip permissions check for admins.
-    for _, email in settings.ADMINS:
-        if email == request.user.email:
-            return
-
-    or_spec = []
-    for ocd_id, permissions in ocd_id_permissions:
-        or_spec.append({
-            'ocd_id': ocd_id,
-            'permissions': {'$all': permissions}})
-
-    spec = {
-        'username': request.user.username,
-        '$or': or_spec}
-
-    if not user_db.permissions.find_one(spec):
-
-        # Hack for passing context data to PermissionDenied. May be
-        # supported in django soon.
-        # See https://code.djangoproject.com/ticket/20156.
-        request.anthropod_ocd_id = ocd_id
-        request.anthropod_permissions = permissions
-
-        raise PermissionDenied()
-
-
 def check_permissions(request, ocd_id, *permissions):
     '''Check whether the request.user has the specified permissions;
     if not, raise PermissionDenied.
@@ -108,7 +78,6 @@ class PermissionChecker(object):
 
     # Make these accessible on the class.
     check_permissions = check_permissions
-    any_permissions = any_permissions
     check_admin = check_admin
     PermissionDenied = PermissionDenied
 
