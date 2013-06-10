@@ -9,7 +9,7 @@ import larvae.membership
 
 from ...core import db
 from ..forms.memb import EditForm
-from ..permissions import check_permissions, any_permissions
+from ..permissions import check_permissions
 from .base import RestrictedView
 from .utils import log_change
 
@@ -18,22 +18,23 @@ class Edit(RestrictedView):
 
     collection = db.memberships
     validator = larvae.membership.Membership
+    form_class = EditForm
 
-    def get(self, request, _id=None):
+    def get(self, request):
+        _id = self.form.data.get('_id')
         if _id is not None:
             # Edit an existing object.
             obj = self.collection.find_one(_id)
 
-            self.any_permissions(request, [
-                (obj['organization_id'], ['organizations.edit']),
-                (obj['person_id'], ['people.edit'])])
+            self.check_permissions(
+                request, obj['organization_id'], 'organizations.edit')
 
             context = dict(
                 obj=obj,
                 form=EditForm.from_popolo(obj),
                 action='edit')
         else:
-            check_permissions(request, _id, 'memberships.create')
+            self.check_permissions(request, _id, 'memberships.create')
 
             # Create a new object.
             context = dict(form=EditForm(), action='create')
@@ -41,10 +42,9 @@ class Edit(RestrictedView):
         return render(request, 'memb/edit.html', context)
 
     def post(self, request, _id=None):
-        form = EditForm(request.POST)
-        if form.is_valid():
-            obj = form.as_popolo(request)
-
+        if self.form.is_valid():
+            obj = self.form.as_popolo(request)
+            _id = self.form.data.get('_id')
             if _id is not None:
                 action = 'memberships.edit'
                 check_permissions(request, _id, action)
@@ -84,17 +84,14 @@ def jsonview(request, _id):
     return render(request, 'memb/jsonview.html', context)
 
 
-@require_POST
 @login_required
 def confirm_delete(request):
     '''Confirm delete.'''
     # Get the membership id.
-    _id = request.POST.get('_id')
+    _id = request.GET['_id']
     obj = db.memberships.find_one(_id)
 
-    any_permissions(request, [
-        (obj['organization_id'], ['organizations.edit']),
-        (obj['person_id'], ['people.edit'])])
+    check_permissions(request, obj['organization_id'], ['organizations.edit'])
 
     context = dict(memb=obj, nav_active='person')
     return render(request, '/memb/confirm_delete.html', context)
@@ -108,9 +105,7 @@ def delete(request):
     obj = db.memberships.find_one(_id)
 
     # Check permissions.
-    any_permissions(request, [
-        (obj['organization_id'], ['organizations.edit']),
-        (obj['person_id'], ['people.edit'])])
+    check_permissions(request, obj['organization_id'], ['organizations.edit'])
 
     # Format a flash message.
     vals = (obj.person().display(), obj.organization().display())
