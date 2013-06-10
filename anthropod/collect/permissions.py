@@ -3,7 +3,8 @@ import logging
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 
-from anthropod.core import user_db
+from anthropod.core import db, user_db
+from anthropod.utils import Cached
 
 
 logger = logging.getLogger(__name__)
@@ -91,3 +92,25 @@ def revoke_permissions(username, ocd_id, *permissions):
     args = (username, permissions)
     logger.info('Revoked the following permissions from %r: %r' % args)
 
+
+class PermissionChecker(object):
+    '''This class provides shortcuts for the boilerplate permissions
+    checking code. The permissions-checking functions are all available
+    on the class.
+    '''
+
+    # Make these accessible on the class.
+    check_permissions = check_permissions
+    any_permissions = any_permissions
+    PermissionDenied = PermissionDenied
+
+    # Subclasses set this--used in the `form` method below.
+    form_class = None
+
+    def __init__(self, request):
+        self.request = request
+
+    @Cached
+    def form(self):
+        formdata = getattr(self.request, self.request.method)
+        return self.form_class(formdata)
