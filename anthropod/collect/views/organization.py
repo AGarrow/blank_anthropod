@@ -27,16 +27,19 @@ class Edit(RestrictedView):
 
     collection = db.organizations
     validator = larvae.organization.Organization
+    form_class = EditForm
 
-    def get(self, request, geo_id=None, _id=None):
-        if _id is not None:
-            self.check_permissions(request, _id, 'organizations.edit')
-            # Edit an existing object.
-            obj = self.collection.find_one(_id)
-            context = dict(
-                obj=obj,
-                form=EditForm.from_popolo(obj),
-                action='edit')
+    def get(self, request, geo_id=None):
+        _id = self.form.data.get('_id') or None
+        if self.form.is_valid():
+            if _id is not None:
+                self.check_permissions(request, _id, 'organizations.edit')
+                # Edit an existing object.
+                obj = self.collection.find_one(_id)
+                context = dict(
+                    obj=obj,
+                    form=EditForm.from_popolo(obj),
+                    action='edit')
         else:
             self.check_permissions(request, _id, 'organizations.create')
             # Create a new object.
@@ -45,12 +48,11 @@ class Edit(RestrictedView):
         context['nav_active'] = 'org'
         return render(request, 'organization/edit.html', context)
 
-    def post(self, request, geo_id=None, _id=None):
-        form = EditForm(request.POST)
-        if form.is_valid():
-            obj = form.as_popolo(request)
-
-            if _id is not None:
+    def post(self, request, geo_id=None):
+        if self.form.is_valid():
+            obj = self.form.as_popolo(request)
+            _id = self.form.data.get('_id')
+            if _id:
                 action = 'organizations.edit'
                 self.check_permissions(request, _id, action)
                 # Apply the form changes to the existing object.
@@ -60,7 +62,7 @@ class Edit(RestrictedView):
                 msg = 'Successfully edited organization named %(name)s.'
             else:
                 action = 'organizations.create'
-                self.check_permissions(request, _id, action)
+                self.check_permissions(request, _id or None, action)
                 obj['_id'] = generate_id('organization')
                 msg = 'Successfully created new organization named %(name)s.'
 
