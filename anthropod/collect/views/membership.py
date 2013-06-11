@@ -45,9 +45,10 @@ class Edit(RestrictedView):
         if self.form.is_valid():
             obj = self.form.as_popolo(request)
             _id = self.form.data.get('_id')
+            org_id = self.form.data['organization_id']
             if _id is not None:
+                check_permissions(request, org_id, 'organizations.edit')
                 action = 'memberships.edit'
-                check_permissions(request, _id, action)
 
                 # Apply the form changes to the existing object.
                 existing_obj = self.collection.find_one(_id)
@@ -56,8 +57,7 @@ class Edit(RestrictedView):
                 msg = "Successfully edited %s's membership in %s."
             else:
                 action = 'memberships.create'
-                check_permissions(request, _id, action)
-
+                check_permissions(request, _id, 'organizations.edit')
                 msg = "Successfully created %s's membership in %s."
 
             msg_args = (obj.person().display(), obj.organization().display())
@@ -90,22 +90,28 @@ def confirm_delete(request):
     # Get the membership id.
     _id = request.GET['_id']
     obj = db.memberships.find_one(_id)
-
-    check_permissions(request, obj['organization_id'], ['organizations.edit'])
+    check_permissions(request, obj['organization_id'], 'memberships.delete')
 
     context = dict(memb=obj, nav_active='person')
-    return render(request, '/memb/confirm_delete.html', context)
+    return render(request, 'memb/confirm_delete.html', context)
 
 
 @require_POST
 @login_required
 def delete(request):
+    '''This is the view that handles deletions from a membership
+    detail page. Deletions from clicking inline on the buttons on
+    person.memb.listing and org.memb.listing views are handled by
+    person.memb.confirm_delete and organization.memb.confirm_delete,
+    respectively. Each of those redirects to the person or org
+    membership listing.
+    '''
     # Get the object.
-    _id = request.POST.get('_id')
+    _id = request.POST['_id']
     obj = db.memberships.find_one(_id)
 
     # Check permissions.
-    check_permissions(request, obj['organization_id'], ['organizations.edit'])
+    check_permissions(request, obj['organization_id'], 'memberships.delete')
 
     # Format a flash message.
     vals = (obj.person().display(), obj.organization().display())
@@ -117,4 +123,4 @@ def delete(request):
     log_change(request, _id, 'memberships.delete')
 
     kwargs = dict(_id=obj.person().id)
-    return redirect(reverse('person.memb.listing', kwargs=kwargs))
+    return redirect(reverse('org.memb.listing', kwargs=kwargs))
