@@ -204,7 +204,6 @@ class Edit(RestrictedView):
         self.obj_as_popolo(obj)
         person_id = self.collection.save(obj)
 
-        import pdb; pdb.set_trace()
         self.log_change(self.request, person_id, 'person.create')
         messages.info(self.request, msg % obj)
 
@@ -220,19 +219,18 @@ class Edit(RestrictedView):
         # Save.
         _id = db.memberships.save(obj)
         self.log_change(self.request, _id, 'membership.create')
-        return redirect('person.jsonview', _id=person_id)
+        return redirect('org.memb.listing', _id=org_id)
 
     def post_create(self):
-        self.check_create()
+        self.permission_checker.check_create()
 
         obj = self.form.as_popolo(self.request)
         obj['_id'] = generate_id('person')
         msg = 'Successfully created new person named %(name)s.'
 
         # Validate and save.
-        self.validate_obj(obj)
-        obj = obj.as_dict()
-        _id = self.person(obj)
+        obj = self.obj_as_popolo(obj)
+        _id = self.collection.save(obj)
         self.log_change(self.request, _id, 'person.create')
         messages.info(self.request, msg % obj)
         return redirect('person.jsonview', _id=_id)
