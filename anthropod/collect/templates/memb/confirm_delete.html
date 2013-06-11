@@ -1,12 +1,12 @@
 {% extends "memb/base.html" %}
+{% load customtags %}
 {% block viewname %}&nbsp;/&nbsp;confirm delete{% endblock %}
 {% block memb_content %}
 <h2>{{memb.name}}</h2>
 
-  <form action="{% url 'organization.memb.delete' %}" method="POST">
+  <form action="{% url 'memb.delete' %}" method="POST">
     {% csrf_token %}
     <input type="hidden" value="{{memb.id}}" name="_id"></input>
-    <input type="hidden" value="{{memb.organization.id}}" name="_id"></input>
     <button type="submit" class="btn btn-danger">
       <i class="icon-remove"></i> Really delete this membership?
     </button>
