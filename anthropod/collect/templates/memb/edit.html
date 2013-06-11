@@ -90,28 +90,7 @@
     </thead>
     <tbody>
     {% if form.is_bound %}
-      {% for type, value, note in form.contacts %}
-        <tr>
-          <td>
-            <select id="id_contact_type" name="contact_type">
-              {% for val, display in form.fields.contact_type.widget.choices %}
-                <option value="{{val}}" {% if val == type %}selected{% endif %}>{{display}}</option>
-              {% endfor %}
-            </select>
-          </td>
-          <td>
-            <input id="id_contact_value" name="contact_value" type="text" value="{{value}}"/>
-          </td>
-          <td>
-            <input id="id_contact_note" name="contact_note" type="text" value="{{note}}"/>
-          </td>
-          <td>
-            <button class="btn remove-row">
-              <i class="icon-remove"></i>
-            </button>
-          </td>
-        </tr>
-      {% endfor %}
+{% include "contact_details.html" %}
     {% endif %}
       <tr class='row-template' data-fieldname='contact'>
         <td>

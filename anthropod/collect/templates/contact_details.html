@@ -1,0 +1,22 @@
+      {% for contact in form.contacts %}
+        <tr>
+          <td>
+            <select id="id_contact_type" name="contact_type">
+              {% for val, display in form.fields.contact_type.widget.choices %}
+                <option value="{{val}}" {% if val == contact.type %}selected{% endif %}>{{display}}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td>
+            <input id="id_contact_value" name="contact_value" type="text" value="{{contact.value}}"/>
+          </td>
+          <td>
+            <input id="id_contact_note" name="contact_note" type="text" value="{{contact.note}}"/>
+          </td>
+          <td>
+            <button class="btn remove-row">
+              <i class="icon-remove"></i>
+            </button>
+          </td>
+        </tr>
+      {% endfor %}

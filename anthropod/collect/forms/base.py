@@ -72,7 +72,7 @@ class BaseForm(forms.Form):
         return self.zipfields(request,
                               prefix='contact_',
                               fields=('type', 'value', 'note'),
-                              asdict=False)
+                              asdict=True)
 
     def sources(self, request):
         '''Return this form's sources as a popolo array like:
