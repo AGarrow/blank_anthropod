@@ -30,16 +30,15 @@ class Edit(RestrictedView):
     form_class = EditForm
 
     def get(self, request, geo_id=None):
-        _id = self.form.data.get('_id') or None
-        if self.form.is_valid():
-            if _id is not None:
-                self.check_permissions(request, _id, 'organizations.edit')
-                # Edit an existing object.
-                obj = self.collection.find_one(_id)
-                context = dict(
-                    obj=obj,
-                    form=EditForm.from_popolo(obj),
-                    action='edit')
+        _id = request.GET.get('_id')
+        if _id is not None:
+            self.check_permissions(request, _id, 'organizations.edit')
+            # Edit an existing object.
+            obj = self.collection.find_one(_id)
+            context = dict(
+                obj=obj,
+                form=EditForm.from_popolo(obj),
+                action='edit')
         else:
             self.check_permissions(request, _id, 'organizations.create')
             # Create a new object.
