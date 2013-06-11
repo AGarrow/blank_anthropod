@@ -11,7 +11,7 @@
     {% for memb in obj.memberships %}
     <tr>
       <td>
-        <a href={{memb.person.jsonview_url|safe}}>
+        <a href="{% url 'memb.jsonview' memb.id %}">
           {{memb.person.display}}</td>
         </a>
       </td>
