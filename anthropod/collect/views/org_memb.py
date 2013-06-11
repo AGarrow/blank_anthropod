@@ -37,7 +37,7 @@ class SelectPerson(RestrictedView):
         '''
 
         # Check permissions.
-        action = 'organizations.edit'
+        action = 'memberships.create'
         person_ids = request.POST.getlist('person_id')
         self.check_permissions(request, org_id, action)
 
@@ -60,7 +60,7 @@ class SelectPerson(RestrictedView):
 def confirm_delete(request):
     _id = request.GET['_id']
     obj = db.memberships.find_one(_id)
-    check_permissions(request, obj['organization_id'], 'organizations.edit')
+    check_permissions(request, obj['organization_id'], 'memberships.delete')
     context = dict(memb=obj, nav_active='org')
     return render(request, 'organization/memb/confirm_delete.html', context)
 
@@ -68,13 +68,16 @@ def confirm_delete(request):
 @require_POST
 @login_required
 def delete(request):
-
+    '''This is the view that handles deletions from clicking on the
+    inline buttons in the org.memb.listing view. It (arguably) needs its
+    own view to redirect back to the org's membership list.
+    '''
     # Retrieve the membership object.
-    _id = request.POST.get('_id')
+    _id = request.POST['_id']
     obj = db.memberships.find_one(_id)
 
     # Make sure user can delete.
-    action = 'organizations.edit'
+    action = 'memberships.delete'
     check_permissions(request, obj['organization_id'], action)
 
     # Delete and log the change.
@@ -87,4 +90,4 @@ def delete(request):
     messages.info(request, msg)
 
     kwargs = dict(_id=obj.organization().id)
-    return redirect(reverse('organization.jsonview', kwargs=kwargs))
+    return redirect(reverse('org.memb.listing', kwargs=kwargs))
