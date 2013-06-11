@@ -59,8 +59,8 @@ class SelectOrg(RestrictedView):
     def post(self, request):
         org_ids = request.POST.getlist('org_id')
         person_id = request.POST['person_id']
-        self.check_permissions(request, person_id, 'people.edit')
         for org_id in org_ids:
+            self.check_permissions(request, org_id, 'memberships.create')
             membership = self.validator(
                 person_id=person_id,
                 organization_id=org_id)
@@ -78,7 +78,7 @@ def confirm_delete(request):
     # Get the membership id.
     _id = request.GET['_id']
     obj = db.memberships.find_one(_id)
-    check_permissions(request, obj['person_id'], 'people.edit')
+    check_permissions(request, obj['organization_id'], 'memberships.delete')
     context = dict(memb=obj, nav_active='person')
     return render(request, 'person/memb/confirm_delete.html', context)
 
@@ -86,15 +86,26 @@ def confirm_delete(request):
 @require_POST
 @login_required
 def delete(request):
-    # Get the membership id.
-    _id = request.POST.get('_id')
-
+    '''This is the view that handles deletions from clicking on the
+    inline buttons in the person.memb.listing view. It (arguably) needs its
+    own view in order to redirect back to the person's membership list.
+    '''
+    # Retrieve the membership object.
+    _id = request.POST['_id']
     obj = db.memberships.find_one(_id)
-    check_permissions(request, obj['person_id'], 'people.edit')
-    vals = (obj.person().display(), obj.organization().display())
-    msg = "Deleted %s's membership in %s."
-    kwargs = dict(_id=obj.person().id)
+
+    # Make sure user can delete.
+    action = 'memberships.delete'
+    check_permissions(request, obj['organization_id'], action)
+
+    # Delete and log the change.
     db.memberships.remove(_id)
-    log_change(request, _id, 'memberships.delete')
-    messages.info(request, msg % vals)
+    log_change(request, _id, action)
+
+    # Generate a flash message.
+    vals = (obj.person().display(), obj.organization().display())
+    msg = "Deleted %s's membership in %r." % vals
+    messages.info(request, msg)
+
+    # Redirect to the person's membership listing.
     return redirect(reverse('person.jsonview', kwargs=kwargs))
