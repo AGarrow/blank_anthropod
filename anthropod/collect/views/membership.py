@@ -46,12 +46,19 @@ class Edit(RestrictedView):
             obj = self.form.as_popolo(request)
             _id = self.form.data.get('_id')
             org_id = self.form.data['organization_id']
+            unset_fields = set()
             if _id is not None:
                 check_permissions(request, org_id, 'organizations.edit')
                 action = 'memberships.edit'
+                existing_obj = self.collection.find_one(_id)
+
+                # Determine whether any fields have been unset.
+                unset_fields = set(existing_obj) - set(obj)
+                for field in set(unset_fields):
+                    if field.startswith('_'):
+                        unset_fields.remove(field)
 
                 # Apply the form changes to the existing object.
-                existing_obj = self.collection.find_one(_id)
                 existing_obj.update(obj)
                 obj = existing_obj
                 msg = "Successfully edited %s's membership in %s."
@@ -71,6 +78,12 @@ class Edit(RestrictedView):
             # Save.
             _id = self.collection.save(obj)
             self.log_change(request, _id, action)
+
+            # And unset the emtpy fields, i.e., where someone field contents.
+            if unset_fields:
+                doc = {'$unset': dict.fromkeys(unset_fields)}
+                self.collection.update(obj, doc)
+
             messages.success(request, msg % msg_args)
             return redirect('memb.jsonview', _id=_id)
         else:

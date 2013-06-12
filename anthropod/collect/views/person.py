@@ -176,8 +176,16 @@ class Edit(RestrictedView):
         obj = self.form.as_popolo(self.request)
         _id = self.form.data['_id']
 
-        # Apply the form changes to the existing object.
+        # Pull the existing object.
         existing_obj = self.collection.find_one(_id)
+
+        # Determine whether any fields have been unset.
+        unset_fields = set(existing_obj) - set(obj)
+        for field in set(unset_fields):
+            if field.startswith('_'):
+                unset_fields.remove(field)
+
+        # Apply the form changes to the existing object.
         existing_obj.update(obj)
         obj = existing_obj
         msg = 'Successfully updated person named %(name)s.'
@@ -185,6 +193,10 @@ class Edit(RestrictedView):
         # Validate and save.
         obj = self.obj_as_popolo(obj)
         _id = self.collection.save(obj)
+
+        # And unset the emtpy fields, i.e., where someone field contents.
+        doc = {'$unset': dict.fromkeys(unset_fields)}
+        self.collection.update(obj, doc)
 
         messages.info(self.request, msg % obj)
         self.log_change(self.request, _id, 'person.edit')
