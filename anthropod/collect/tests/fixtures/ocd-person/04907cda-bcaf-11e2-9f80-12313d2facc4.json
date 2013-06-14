@@ -1,0 +1,27 @@
+{
+    "_type": "person", 
+    "contact_details": [
+        {
+            "note": "", 
+            "type": "address", 
+            "value": "1900 Lamont Street, NW Apt. 304 Washington, DC 20010"
+        }, 
+        {
+            "note": "", 
+            "type": "email", 
+            "value": "1D05@anc.dc.gov"
+        }
+    ], 
+    "name": "China Terrell", 
+    "links": [], 
+    "gender": "f", 
+    "other_names": [], 
+    "sources": [
+        {
+            "url": "http://anc.dc.gov/page/advisory-neighborhood-commission-1d", 
+            "note": ""
+        }
+    ], 
+    "extras": {}, 
+    "_id": "ocd-person/04907cda-bcaf-11e2-9f80-12313d2facc4"
+}

@@ -1,0 +1,15 @@
+{
+    "_type": "organization",
+    "contact_details": [],
+    "name": "Manchester Board of Aldermen",
+    "identifiers": [],
+    "posts": [],
+    "sources": [
+        {
+            "url": "http://www.manchesternh.gov/website/MayorandAldermen/Aldermen/tabid/192/Default.aspx",
+            "note": ""
+        }
+    ],
+    "geography_id": "ocd-division/country:us/state:nh/place:manchester",
+    "_id": "ocd-organization/1bfc9aac-b29b-11e2-9e8b-12313d2facc4"
+}

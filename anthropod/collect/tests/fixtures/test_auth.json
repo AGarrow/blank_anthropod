@@ -1,0 +1,299 @@
+[
+{
+    "pk": 1, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "add_permission", 
+        "name": "Can add permission", 
+        "content_type": 1
+    }
+},
+{
+    "pk": 2, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "change_permission", 
+        "name": "Can change permission", 
+        "content_type": 1
+    }
+},
+{
+    "pk": 3, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "delete_permission", 
+        "name": "Can delete permission", 
+        "content_type": 1
+    }
+},
+{
+    "pk": 4, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "add_group", 
+        "name": "Can add group", 
+        "content_type": 2
+    }
+},
+{
+    "pk": 5, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "change_group", 
+        "name": "Can change group", 
+        "content_type": 2
+    }
+},
+{
+    "pk": 6, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "delete_group", 
+        "name": "Can delete group", 
+        "content_type": 2
+    }
+},
+{
+    "pk": 7, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "add_user", 
+        "name": "Can add user", 
+        "content_type": 3
+    }
+},
+{
+    "pk": 8, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "change_user", 
+        "name": "Can change user", 
+        "content_type": 3
+    }
+},
+{
+    "pk": 9, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "delete_user", 
+        "name": "Can delete user", 
+        "content_type": 3
+    }
+},
+{
+    "pk": 10, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "add_contenttype", 
+        "name": "Can add content type", 
+        "content_type": 4
+    }
+},
+{
+    "pk": 11, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "change_contenttype", 
+        "name": "Can change content type", 
+        "content_type": 4
+    }
+},
+{
+    "pk": 12, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "delete_contenttype", 
+        "name": "Can delete content type", 
+        "content_type": 4
+    }
+},
+{
+    "pk": 13, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "add_session", 
+        "name": "Can add session", 
+        "content_type": 5
+    }
+},
+{
+    "pk": 14, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "change_session", 
+        "name": "Can change session", 
+        "content_type": 5
+    }
+},
+{
+    "pk": 15, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "delete_session", 
+        "name": "Can delete session", 
+        "content_type": 5
+    }
+},
+{
+    "pk": 16, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "add_site", 
+        "name": "Can add site", 
+        "content_type": 6
+    }
+},
+{
+    "pk": 17, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "change_site", 
+        "name": "Can change site", 
+        "content_type": 6
+    }
+},
+{
+    "pk": 18, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "delete_site", 
+        "name": "Can delete site", 
+        "content_type": 6
+    }
+},
+{
+    "pk": 19, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "add_usersocialauth", 
+        "name": "Can add user social auth", 
+        "content_type": 7
+    }
+},
+{
+    "pk": 20, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "change_usersocialauth", 
+        "name": "Can change user social auth", 
+        "content_type": 7
+    }
+},
+{
+    "pk": 21, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "delete_usersocialauth", 
+        "name": "Can delete user social auth", 
+        "content_type": 7
+    }
+},
+{
+    "pk": 22, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "add_nonce", 
+        "name": "Can add nonce", 
+        "content_type": 8
+    }
+},
+{
+    "pk": 23, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "change_nonce", 
+        "name": "Can change nonce", 
+        "content_type": 8
+    }
+},
+{
+    "pk": 24, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "delete_nonce", 
+        "name": "Can delete nonce", 
+        "content_type": 8
+    }
+},
+{
+    "pk": 25, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "add_association", 
+        "name": "Can add association", 
+        "content_type": 9
+    }
+},
+{
+    "pk": 26, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "change_association", 
+        "name": "Can change association", 
+        "content_type": 9
+    }
+},
+{
+    "pk": 27, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "delete_association", 
+        "name": "Can delete association", 
+        "content_type": 9
+    }
+},
+{
+    "pk": 1, 
+    "model": "auth.user", 
+    "fields": {
+        "username": "user1", 
+        "first_name": "", 
+        "last_name": "", 
+        "is_active": true, 
+        "is_superuser": false, 
+        "is_staff": false, 
+        "last_login": "2013-06-14T19:22:20.444Z", 
+        "groups": [], 
+        "user_permissions": [], 
+        "password": "pbkdf2_sha256$10000$f2PJj0oi6rCi$Ujd703UhJESgGdljPRhRq+ClwuzhI3gwZfqcRGe7e6o=", 
+        "email": "user1@example.com", 
+        "date_joined": "2013-06-14T19:22:20.444Z"
+    }
+},
+{
+    "pk": 2, 
+    "model": "auth.user", 
+    "fields": {
+        "username": "user2", 
+        "first_name": "", 
+        "last_name": "", 
+        "is_active": true, 
+        "is_superuser": false, 
+        "is_staff": false, 
+        "last_login": "2013-06-14T19:22:36.861Z", 
+        "groups": [], 
+        "user_permissions": [], 
+        "password": "pbkdf2_sha256$10000$96uu783uJmFZ$4p7AoTcoIPvkE2v3nsqpRqNbpAMYIzVFofH774YIuUg=", 
+        "email": "user2@example.com", 
+        "date_joined": "2013-06-14T19:22:36.861Z"
+    }
+},
+{
+    "pk": 3, 
+    "model": "auth.user", 
+    "fields": {
+        "username": "user3", 
+        "first_name": "", 
+        "last_name": "", 
+        "is_active": true, 
+        "is_superuser": false, 
+        "is_staff": false, 
+        "last_login": "2013-06-14T19:22:50.324Z", 
+        "groups": [], 
+        "user_permissions": [], 
+        "password": "pbkdf2_sha256$10000$hk0xEWLgMLeq$z0iBuOUMzTqERDEeIPxaAlbysaXL0bSzBZCkTO89tzg=", 
+        "email": "user3@example.com", 
+        "date_joined": "2013-06-14T19:22:50.324Z"
+    }
+}
+]
