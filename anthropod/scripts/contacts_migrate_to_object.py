@@ -14,8 +14,8 @@ for obj in db.people.find():
     db.people.save(migrate_contacts(obj))
 
 for obj in db.organizations.find():
-    db.people.save(migrate_contacts(obj))
+    db.organizations.save(migrate_contacts(obj))
 
 for obj in db.memberships.find():
-    db.people.save(migrate_contacts(obj))
+    db.memberships.save(migrate_contacts(obj))
 
