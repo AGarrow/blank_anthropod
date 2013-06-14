@@ -2,7 +2,6 @@
 {% load staticfiles %}
 
 {% block extra_head %}
-<link href='http://fonts.googleapis.com/css?family=Herr+Von+Muellerhoff' rel='stylesheet' type='text/css'>
 <style>
 span.silly {
   font-family: 'Herr Von Muellerhoff', cursive;
@@ -19,18 +18,18 @@ span.silly {
 
 {% block content %}
 <div class="container">
-  <div class="ah-ah-ah">
-    <h1><span class="silly ah-ah-ah">Permission Denied</span></h1>
-    <img class="ah-ah-ah" src="{% static 'img/newmann.gif' %}">
-    <div class="ah-ah-ah">
-      <h4>You need the following permissions to do that:</h4>
-      <ul>
-        <li>ocd_id: {{request.anthropod_ocd_id}}</li>
-        {% for permission in request.anthropod_permissions %}
-          <li>{{permission}}</li>
-        {% endfor %}
-      </ul>
-    </div>
-  </div>
+  <h1>403 <span class="muted">Permission denied</span></h1>
+  <p class="lead">Aha! You tried to edit a record. In addition to being awesome, that is also forbidden, as awesome things frequently are.
+  </p>
+  <h3>How permissions work</h3>
+  <p>
+    The permissions system is centered around organizations for the time being, such that you can edit a person's details if you have permission to edit any organization the person is a member of. Having permission to edit an organization also confers the ability to create new people as members of the organization. The remaining actions are only available to admins:
+    <ul>
+      <li>creating and deleting organizations</li>
+      <li>deleting people</li>
+      <li>adding an existing person as a member of an existing org</li>
+      <li>creating a new standalone person (i.e., not as a member of an org)</li>
+      <li>deleting memberships</li>
+  </p>
 </div>
 {% endblock %}
