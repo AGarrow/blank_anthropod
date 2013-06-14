@@ -1,3 +1,6 @@
+import os
+import contextlib
+
 
 class Cached(object):
     '''Computes attribute value and caches it in instance.
@@ -22,3 +25,17 @@ class Cached(object):
         setattr(inst, self.name, result)
         return result
 
+
+@contextlib.contextmanager
+def cd(path):
+    '''Creates the path if it doesn't exist'''
+    old_dir = os.getcwd()
+    try:
+        os.makedirs(path)
+    except OSError:
+        pass
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(old_dir)
