@@ -87,6 +87,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'django_nose',
     'locksmith.mongoauth',
     'social_auth',
     'anthropod.collect',
@@ -121,7 +122,7 @@ LOGGING = {
 
 AUTHENTICATION_BACKENDS = (
     'sunlightauth.backends.SunlightBackend',
-    #'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 SUNLIGHT_AUTH_BASE_URL = 'http://login.sunlightfoundation.com/'
@@ -134,3 +135,5 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/sunlight/'
 
 LOCKSMITH_REGISTRATION_URL = 'http://services.sunlightlabs.com/accounts/register/'
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
