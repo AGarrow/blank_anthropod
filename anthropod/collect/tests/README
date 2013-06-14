@@ -1,0 +1,9 @@
+Run the tests like this:
+
+./manage.py tests
+
+The django-nose app enables you to pass nose options:
+
+./manage.py tests --nocapture --pdb-failures
+
+
