@@ -8,7 +8,7 @@
 {% block content %}
 <form method="POST">
 {% csrf_token %}
-<input type="hidden" name="_id" value="{{ organization.id }}">
+<input type="hidden" name="_id" value="{{ obj.id }}">
 
 <table>
   <tbody>
