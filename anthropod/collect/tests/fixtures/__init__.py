@@ -12,6 +12,11 @@ def load_test_fixtures():
     # Load test users. Make user1 admin.
     user_db.profiles.save(dict(_id='user1', is_admin=True))
 
+    # User2 has the full suite of permissions on the sole org and
+    # person in the database but is not admin.
+
+    # User 3 has no permissions at all and is not admin.
+
     # Load test data.
     fixtures = join('anthropod', 'collect', 'tests', 'fixtures')
     collections = {
