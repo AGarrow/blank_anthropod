@@ -11,12 +11,10 @@ from anthropod.collect.views.organization import jsonview
 from .fixtures import load_test_fixtures
 
 
-class AdminUserTest(TestCase):
+class Mixin(object):
     fixtures = ['test_auth.json']
     tearDown = staticmethod(anthropod.tests.teardown)
     maxDiff = None
-
-    login_credentials = dict(username='user1', password='password1')
 
     def setUp(self):
         '''Load test fixtures and log in before running the tests.'''
@@ -24,32 +22,6 @@ class AdminUserTest(TestCase):
         self.client = Client()
         self.client.login(**self.login_credentials)
         self.db = anthropod.core.db
-
-    def test_edit(self):
-        '''This test verifies that a new person created with
-        the form will get saved as the expected popolo data object.
-        '''
-        # Create a new organization.
-        url = reverse('organization.edit')
-        resp = self.client.post(url, dict(self.params))
-
-        # Make sure we redirected after the save.
-        self.assertEquals(resp.status_code, 302)
-
-        # Verify that the redirect was to the org jsonview.
-        location = dict(resp.items())['Location']
-        location = re.sub('http://testserver', '', location)
-        redirect_view = resolve(location).func
-        self.assertEquals(redirect_view, jsonview)
-
-        # Now verify that the saved popolo object
-        # matches what we expect.
-        ocd_id = re.search(r'ocd-organization.+', location).group()
-        ocd_id = ocd_id.rstrip('/')
-        saved = self.db.organizations.find_one(ocd_id)
-        saved.pop('_id')
-
-        self.assertEquals(saved, self.expected)
 
     expected = {
         u'_type': u'organization',
@@ -86,6 +58,36 @@ class AdminUserTest(TestCase):
         (u'name', u'City Council')
         ]
 
+
+class AdminUserTest(TestCase, Mixin):
+
+    login_credentials = dict(username='user1', password='password1')
+
+    def test_edit(self):
+        '''This test verifies that a new person created with
+        the form will get saved as the expected popolo data object.
+        '''
+        # Create a new organization.
+        url = reverse('organization.edit')
+        resp = self.client.post(url, dict(self.params))
+
+        # Make sure we redirected after the save.
+        self.assertEquals(resp.status_code, 302)
+
+        # Verify that the redirect was to the org jsonview.
+        location = dict(resp.items())['Location']
+        location = re.sub('http://testserver', '', location)
+        redirect_view = resolve(location).func
+        self.assertEquals(redirect_view, jsonview)
+
+        # Now verify that the saved popolo object
+        # matches what we expect.
+        ocd_id = re.search(r'ocd-organization.+', location).group()
+        ocd_id = ocd_id.rstrip('/')
+        saved = self.db.organizations.find_one(ocd_id)
+        saved.pop('_id')
+
+        self.assertEquals(saved, self.expected)
 
 
 class AuthorizedUserTest(TestCase):
