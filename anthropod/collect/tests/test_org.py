@@ -12,6 +12,9 @@ from .fixtures import load_test_fixtures
 
 
 class Mixin(object):
+    '''This class just provides names and data common to all the tests
+    in this module.
+    '''
     fixtures = ['test_auth.json']
     tearDown = staticmethod(anthropod.tests.teardown)
     maxDiff = None
@@ -59,7 +62,7 @@ class Mixin(object):
         ]
 
 
-class AdminUserTest(TestCase, Mixin):
+class AdminUserTest(Mixin, TestCase):
 
     login_credentials = dict(username='user1', password='password1')
 
@@ -90,23 +93,11 @@ class AdminUserTest(TestCase, Mixin):
         self.assertEquals(saved, self.expected)
 
 
-class AuthorizedUserTest(TestCase):
+class AuthorizedUserTest(Mixin, TestCase):
     '''These tests are run as a user isn't an admin but has
     permissions to edit all the objects in the database.
     '''
-    fixtures = ['test_auth.json']
-
-    tearDown = staticmethod(anthropod.tests.teardown)
-    maxDiff = None
-
     login_credentials = dict(username='user2', password='password2')
-
-    def setUp(self):
-        '''Load test fixtures and log in before running the tests.'''
-        load_test_fixtures()
-        self.client = Client()
-        self.client.login(**self.login_credentials)
-        self.db = anthropod.core.db
 
     def test_edit(self):
         '''This test verifies that a new person created with
@@ -134,59 +125,12 @@ class AuthorizedUserTest(TestCase):
 
         self.assertEquals(saved, self.expected)
 
-    expected = {
-        u'_type': u'organization',
-        u'contact_details': [
-            {u'note': u'Not a real address',
-             u'type': u'address',
-             u'value': u'123 Example Street'},
-            {u'note': u'Fake phone',
-             u'type': u'cell',
-             u'value': u'(123)456-7890'}],
-        u'geography_id': u'ocd-division/country:us/state:id/place:boise_city',
-        u'identifiers': [],
-        u'name': u'City Council',
-        u'posts': [],
-        u'sources': [
-            {u'note': u'',
-             u'url': u'http://mayor.cityofboise.org/city-council/'},
-            {u'note': u"Sunlight's url",
-             u'url': u'https://sunfoundation.com'}]}
 
-    params = [
-        (u'contact_type', ['address', u'cell']),
-        (u'contact_note', ['Not a real address', u'Fake phone']),
-        (u'contact_value', ['123 Example Street', u'(123)456-7890']),
-        (u'source_url', [
-            'http://mayor.cityofboise.org/city-council/',
-            u'https://sunfoundation.com'
-            ]),
-        (u'source_note', [
-            '',
-            u"Sunlight's url"
-            ]),
-        (u'geography_id', u'ocd-division/country:us/state:id/place:boise_city'),
-        (u'name', u'City Council')
-        ]
-
-
-class UnauthorizedUserTest(TestCase):
+class UnauthorizedUserTest(Mixin, TestCase):
     '''These tests are run as a user has isn't an admin and has no
     permissions to edit anything in the database.
     '''
-    fixtures = ['test_auth.json']
-
-    tearDown = staticmethod(anthropod.tests.teardown)
-    maxDiff = None
-
     login_credentials = dict(username='user3', password='password3')
-
-    def setUp(self):
-        '''Load test fixtures and log in before running the tests.'''
-        load_test_fixtures()
-        self.client = Client()
-        self.client.login(**self.login_credentials)
-        self.db = anthropod.core.db
 
     def test_edit(self):
         '''This test verifies that a new person created with
@@ -198,19 +142,3 @@ class UnauthorizedUserTest(TestCase):
 
         # Make sure the unauthorized user gets a 403 page.
         self.assertEquals(resp.status_code, 403)
-
-    params = [
-        (u'contact_type', ['address', u'cell']),
-        (u'contact_note', ['Not a real address', u'Fake phone']),
-        (u'contact_value', ['123 Example Street', u'(123)456-7890']),
-        (u'source_url', [
-            'http://mayor.cityofboise.org/city-council/',
-            u'https://sunfoundation.com'
-            ]),
-        (u'source_note', [
-            '',
-            u"Sunlight's url"
-            ]),
-        (u'geography_id', u'ocd-division/country:us/state:id/place:boise_city'),
-        (u'name', u'City Council')
-        ]
