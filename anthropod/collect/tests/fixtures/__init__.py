@@ -26,6 +26,17 @@ def load_test_fixtures():
         'permissions': ['organizations.create'],
         'username': 'user2',
         })
+    user_db.permissions.save({
+        "ocd_id": "ocd-person/04907cda-bcaf-11e2-9f80-12313d2facc4",
+        'permissions': [
+            'people.delete',
+            ],
+        'username': u'user2'})
+    user_db.permissions.save({
+        'ocd_id': None,
+        'permissions': ['people.create'],
+        'username': 'user2',
+        })
 
     # User 3 has no permissions at all and is not admin.
     pass
