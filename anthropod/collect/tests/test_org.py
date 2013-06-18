@@ -47,25 +47,31 @@ class AuthorizedMixin(Mixin):
     '''This class defines tests that are common to admin users and
     authorized users that have explicit permissions to edit things.
     '''
-
     expected = {
-        u'_type': u'organization',
-        u'contact_details': [
-            {u'note': u'Not a real address',
-             u'type': u'address',
-             u'value': u'123 Example Street'},
-            {u'note': u'Fake phone',
-             u'type': u'cell',
-             u'value': u'(123)456-7890'}],
-        u'geography_id': u'ocd-division/country:us/state:id/place:boise_city',
-        u'identifiers': [],
-        u'name': u'City Council',
-        u'posts': [],
-        u'sources': [
-            {u'note': u'',
-             u'url': u'http://mayor.cityofboise.org/city-council/'},
-            {u'note': u"Sunlight's url",
-             u'url': u'https://sunfoundation.com'}]}
+        '_type': 'organization',
+        'classification': None,
+        'contact_details': [
+            {'note': 'Not a real address',
+             'type': 'address',
+             'value': '123 Example Street'},
+            {'note': 'Fake phone',
+             'type': 'cell',
+             'value': '(123)456-7890'}],
+        'dissolution_date': None,
+        'founding_date': None,
+        'geography_id': 'ocd-division/country:us/state:id/place:boise_city',
+        'identifiers': [],
+        'name': 'City Council',
+        'other_names': [],
+        'parent_id': None,
+        'posts': [],
+        'sources': [
+            {'url': 'http://mayor.cityofboise.org/city-council/',
+             'note': None},
+            {'note': "Sunlight's url",
+             'url': 'https://sunfoundation.com'}]
+        }
+
 
     def test_edit(self):
         '''This test verifies that a new person created with
