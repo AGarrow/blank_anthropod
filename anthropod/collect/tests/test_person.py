@@ -75,8 +75,8 @@ class AuthorizedMixin(Mixin):
         'summary': None}
 
     def test_edit(self):
-        '''This test verifies that a new person created with
-        the form will get saved as the expected popolo data object.
+        '''This test verifies that a person edited with
+        the form will be saved as the expected popolo data object.
         '''
         # Create a new person.
         url = reverse('person.edit')
@@ -138,8 +138,8 @@ class UnauthorizedUserTest(Mixin, TestCase):
     login_credentials = dict(username='user3', password='password3')
 
     def test_edit(self):
-        '''This test verifies that a new person created with
-        the form will get saved as the expected popolo data object.
+        '''This test verifies that a person edited with
+        the form will be saved as the expected popolo data object.
         '''
         # Create a new person.
         url = reverse('person.edit')
