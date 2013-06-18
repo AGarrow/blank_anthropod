@@ -130,8 +130,6 @@ class Edit(RestrictedView):
             form=EditForm(initial), action='create',
             nav_active='person',
             hidden_input=HiddenInput)
-        # f = EditForm(initial)
-        # import pdb; pdb.set_trace()
         return render(self.request, 'person/edit.html', context)
 
     def get_create(self):
