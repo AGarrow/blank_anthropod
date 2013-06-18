@@ -55,7 +55,13 @@ class BaseForm(forms.Form):
             # Skip emtpy form values.
             if any(vals):
                 if asdict:
-                    yield dict(zip(fields, vals))
+                    res = dict(zip(fields, vals))
+
+                    # Convert '' to None.
+                    for k, v in res.items():
+                        if v == '':
+                            res[k] = None
+                    yield res
                 else:
                     yield vals
 
