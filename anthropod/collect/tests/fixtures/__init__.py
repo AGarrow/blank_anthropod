@@ -10,7 +10,7 @@ from anthropod.utils import cd
 
 def load_test_fixtures():
     # Load test users. Make user1 admin.
-    user_db.profiles.save(dict(_id='user1', is_admin=True))
+    user_db.profiles.save(dict(_id='user1@example.com', is_admin=True))
 
     # User2 has the full suite of permissions on the sole org and
     # person in the database but is not admin.
@@ -20,22 +20,27 @@ def load_test_fixtures():
             'organizations.delete',
             'organizations.edit',
             ],
-        u'username': u'user2'})
+        u'username': u'user2@example.com'})
     user_db.permissions.save({
         'ocd_id': None,
         'permissions': ['organizations.create'],
-        'username': 'user2',
+        'username': 'user2@example.com',
         })
     user_db.permissions.save({
         "ocd_id": "ocd-person/04907cda-bcaf-11e2-9f80-12313d2facc4",
         'permissions': [
             'people.delete',
             ],
-        'username': u'user2'})
+        'username': u'user2@example.com'})
     user_db.permissions.save({
         'ocd_id': None,
         'permissions': ['people.create'],
-        'username': 'user2',
+        'username': 'user2@example.com',
+        })
+    user_db.permissions.save({
+        'ocd_id': 'ocd-organization/1bfc9aac-b29b-11e2-9e8b-12313d2facc4',
+        'permissions': ['memberships.delete'],
+        'username': 'user2@example.com',
         })
 
     # User 3 has no permissions at all and is not admin.
