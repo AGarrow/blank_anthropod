@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 import larvae.membership
 
 from ...core import db
+from ..models import Membership
 from ..forms.memb import EditForm
 from ..permissions import check_permissions
 from .base import RestrictedView
@@ -15,7 +16,6 @@ from .utils import log_change
 
 
 class Edit(RestrictedView):
-
     collection = db.memberships
     validator = larvae.membership.Membership
     form_class = EditForm
@@ -48,8 +48,8 @@ class Edit(RestrictedView):
             org_id = self.form.data['organization_id']
             unset_fields = set()
             if _id is not None:
-                check_permissions(request, org_id, 'organizations.edit')
-                action = 'memberships.edit'
+                action = 'organizations.edit'
+                check_permissions(request, org_id, action)
                 existing_obj = self.collection.find_one(_id)
 
                 # Determine whether any fields have been unset.
@@ -64,8 +64,9 @@ class Edit(RestrictedView):
                 msg = "Successfully edited %s's membership in %s."
             else:
                 action = 'memberships.create'
-                check_permissions(request, _id, 'organizations.edit')
+                check_permissions(request, _id, action)
                 msg = "Successfully created %s's membership in %s."
+                obj = Membership(obj)
 
             msg_args = (obj.person().display(), obj.organization().display())
 
@@ -88,7 +89,7 @@ class Edit(RestrictedView):
             return redirect('memb.jsonview', _id=_id)
         else:
             obj = self.collection.find_one(_id)
-            return render(request, 'memb/edit.html', dict(form=form, obj=obj))
+            return render(request, 'memb/edit.html', dict(form=self.form, obj=obj))
 
 
 def jsonview(request, _id):
