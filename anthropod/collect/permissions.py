@@ -33,13 +33,6 @@ def check_permissions(request, ocd_id, *permissions):
         spec.update(ocd_id=ocd_id)
 
     if not user_db.permissions.find_one(spec):
-
-        # Hack for passing context data to PermissionDenied. May be
-        # supported in django soon.
-        # See https://code.djangoproject.com/ticket/20156.
-        request.anthropod_ocd_id = ocd_id
-        request.anthropod_permissions = permissions
-
         raise PermissionDenied()
 
 
