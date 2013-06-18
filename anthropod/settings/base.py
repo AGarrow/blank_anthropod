@@ -87,7 +87,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'django_nose',
     'locksmith.mongoauth',
     'social_auth',
     'anthropod.collect',

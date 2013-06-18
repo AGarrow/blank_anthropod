@@ -7,6 +7,8 @@ TEMPLATE_DEBUG = DEBUG
 # This has to be set in order for template.DEBUG to be true.
 INTERNAL_IPS = ('127.0.0.1',)
 
+INSTALLED_APPS += ('django_nose',)
+
 MONGO_HOST = 'localhost'
 MONGO_PORT = 27017
 MONGO_DATABASE = 'ocd'
