@@ -47,9 +47,26 @@ class JsonviewFormatter(object):
         rgx = '(http://.+?)"'
         self.data = re.sub(rgx, self.link_replacer, self.data)
 
+    def openstates_id_replacer(self, matchobj):
+        leg_id = matchobj.group(1)
+        type_ = leg_id[2]
+        jurisdiction = leg_id[:2].lower()
+
+        type_ = dict(L='legislators', B='bills', C='committees')[type_]
+        tmpl = ('<a href="http://openstates.org/{jurisdiction}/'
+                '{type_}/{leg_id}/">{leg_id}</a>')
+        repl = tmpl.format(
+            leg_id=leg_id, jurisdiction=jurisdiction, type_=type_)
+        return matchobj.group().replace(matchobj.group(1), repl)
+
+    def openstates_ids(self):
+        rgx = '"([A-Z]{2}[CLB]\d{6})"'
+        self.data = re.sub(rgx, self.openstates_id_replacer, self.data)
+
     def format(self):
         self.ocd_ids()
         self.links()
+        self.openstates_ids()
         return self.data
 
 
