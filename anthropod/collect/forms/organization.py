@@ -58,5 +58,4 @@ class EditForm(BaseForm):
 class ListFilterForm(forms.Form):
     CLASSIFICATIONS = mk_choices(
         ['']  + list(db.organizations.distinct('classification')))
-    print CLASSIFICATIONS
     classification = forms.ChoiceField(choices=CLASSIFICATIONS, required=False)
