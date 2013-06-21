@@ -31,6 +31,13 @@ $(document).ready(function() {
   </span>
   <h1>Organizations</h1>
 
+  <div class="filter-form well">
+    <form action="" method="get">
+    {{ form.as_p }}
+    <input type="submit" value="Filter" />
+    </form>
+  </div>
+
   {% include "organization/_table.html" %}
   {% with object_list=organizations %}
     {% include "_pagination.html" %}

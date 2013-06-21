@@ -13,7 +13,7 @@ from ...core import db
 from ...models.paginators import CursorPaginator
 from ...models.base import _PrettyPrintEncoder
 from ...models.utils import generate_id
-from ..forms.organization import EditForm
+from ..forms.organization import EditForm, ListFilterForm
 from ..permissions import check_permissions
 from .base import RestrictedView
 from .utils import log_change
@@ -91,8 +91,13 @@ def jsonview(request, _id):
 def listing(request):
     context = dict(nav_active='org')
     page = int(request.GET.get('page', 1))
-    orgs = db.organizations.find()
+    form = ListFilterForm(request.GET)
+    spec = {}
+    if 'classification' in form.data:
+        spec['classification'] = form.data['classification']
+    orgs = db.organizations.find(spec)
     context['organizations'] = CursorPaginator(orgs, page=page, show_per_page=10)
+    context['form'] = ListFilterForm(request.GET)
     return render(request, 'organization/list.html', context)
 
 

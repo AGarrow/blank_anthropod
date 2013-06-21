@@ -1,6 +1,7 @@
 from django import forms
 
-from .base import BaseForm
+from anthropod.core import db
+from .base import BaseForm, mk_choices
 
 
 def _mk_choices(iterable):
@@ -52,3 +53,10 @@ class EditForm(BaseForm):
         form.sources = obj.get('sources', [])
 
         return form
+
+
+class ListFilterForm(forms.Form):
+    CLASSIFICATIONS = mk_choices(
+        ['']  + list(db.organizations.distinct('classification')))
+    print CLASSIFICATIONS
+    classification = forms.ChoiceField(choices=CLASSIFICATIONS, required=False)
