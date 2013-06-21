@@ -13,9 +13,11 @@
     <tr>
       <td><a href="{% url 'organization.jsonview' _id=organization.id %}">{{organization.name}}</td>
       <td>
+        {% if organization.geography_id %}
         <a href="{% url 'geo.detail' organization.geography_id %}">
           {{organization.geography_id}}
         </a>
+        {% endif %}
       </td>
       <td>{{organization.source_url}}</td>
       <td>
