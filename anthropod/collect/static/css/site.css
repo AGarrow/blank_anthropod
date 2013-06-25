@@ -5,3 +5,7 @@
 .selected {
     background-color: #D0F2F5;
 }
+
+#id_geography_id {
+    width: 100%;
+}

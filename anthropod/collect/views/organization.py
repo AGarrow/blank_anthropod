@@ -13,7 +13,7 @@ from ...core import db
 from ...models.paginators import CursorPaginator
 from ...models.base import _PrettyPrintEncoder
 from ...models.utils import generate_id
-from ..forms.organization import EditForm, ListFilterForm
+from ..forms.organization import EditForm, CreateForm, ListFilterForm
 from ..permissions import check_permissions
 from .base import RestrictedView
 from .utils import log_change
@@ -27,7 +27,6 @@ class Edit(RestrictedView):
 
     collection = db.organizations
     validator = larvae.organization.Organization
-    form_class = EditForm
 
     def get(self, request, geo_id=None):
         _id = request.GET.get('_id')
@@ -35,22 +34,32 @@ class Edit(RestrictedView):
             self.check_permissions(request, _id, 'organizations.edit')
             # Edit an existing object.
             obj = self.collection.find_one(_id)
-            context = dict(
-                obj=obj,
-                form=EditForm.from_popolo(obj),
-                action='edit')
+            form = EditForm.from_popolo(obj)
+            context = dict(obj=obj, form=form, action='edit')
         else:
             self.check_permissions(request, _id, 'organizations.create')
             # Create a new object.
-            form = EditForm(initial=dict(geography_id=geo_id))
+            form = CreateForm(initial=dict(
+                geography_id=geo_id,
+                jurisdiction_id=self._geo_to_jxn(geo_id)))
             context = dict(form=form, action='create')
         context['nav_active'] = 'org'
         return render(request, 'organization/edit.html', context)
 
+    def _geo_to_jxn(self, geo_id):
+        jxn_id = geo_id.replace('ocd-division', 'ocd-jurisdiction')
+        return jxn_id
+
     def post(self, request, geo_id=None):
-        if self.form.is_valid():
-            obj = self.form.as_popolo(request)
-            _id = self.form.data.get('_id')
+        # Choose the form to use based on whether an _id is found.
+        _id = request.POST['_id']
+        if _id:
+            form = EditForm(request.POST)
+        else:
+            form = CreateForm(request.POST)
+
+        if form.is_valid():
+            obj = form.as_popolo(request)
             if _id:
                 action = 'organizations.edit'
                 self.check_permissions(request, _id, action)
@@ -77,9 +86,9 @@ class Edit(RestrictedView):
             messages.success(request, msg % obj)
             return redirect('organization.jsonview', _id=_id)
         else:
-            obj = self.collection.find_one(_id)
-            context = dict(form=form, obj=obj)
+            context = dict(form=form)
             return render(request, 'organization/edit.html', context)
+
 
 
 def jsonview(request, _id):

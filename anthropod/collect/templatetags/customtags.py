@@ -29,7 +29,8 @@ class JsonviewFormatter(object):
         ocd_id = matchobj.group()
         app = {'person': 'person',
                 'organization': 'orgs',
-                'division': 'geo'}[type_]
+                'division': 'geo',
+                'jurisdiction': 'jxn'}[type_]
         viewname = dict(division='detail').get(type_, 'jsonview')
         return tmpl.format(app=app, ocd_id=ocd_id, viewname=viewname)
 
