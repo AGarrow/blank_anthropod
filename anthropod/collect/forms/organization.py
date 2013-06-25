@@ -15,9 +15,13 @@ class EditForm(BaseForm):
 
     See: https://github.com/opencivicdata/opencivicdata/wiki/
     '''
-    # Required fields.
+    # XXX: This enumeration will eventually come from larvae.
+    CLASSIFICATION_CHOICES = mk_choices(['committee', 'party', 'jurisdiction'])
+
     name = forms.CharField()
-    geography_id = forms.CharField()
+
+    classification = forms.ChoiceField(choices=CLASSIFICATION_CHOICES)
+    geography_id = forms.CharField(required=False)
 
     def as_popolo(self, request):
         '''Return this form's data as a popolo person.
