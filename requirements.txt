@@ -7,3 +7,4 @@ boto
 -e git://github.com/sunlightlabs/django-locksmith.git#egg=django-locksmith
 -e git://github.com/sunlightlabs/django-sunlightauth.git#egg=django-sunlightauth
 django-nose
+-e git+http://github.com/opencivicdata/larvae.git#egg=larvae

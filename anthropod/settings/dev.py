@@ -1,5 +1,8 @@
+# try:
+#   from anthropod.settings.base import *
 from anthropod.settings.local import *
-
+# except ImportError:
+#   pass
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -11,8 +14,14 @@ INSTALLED_APPS += ('django_nose',)
 
 MONGO_HOST = 'localhost'
 MONGO_PORT = 27017
-MONGO_DATABASE = 'ocd'
-MONGO_USER_DATABASE = 'ocd_users'
+MONGO_DATABASE = 'pupa'
+MONGO_USER_DATABASE = 'placeholder'
+
+try:
+  LOGGING
+except NameError:
+  LOGGING={}
+
 
 # Add some extra dev logging.
 LOGGING['formatters']['verbose'] = {
