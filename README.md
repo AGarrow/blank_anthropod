@@ -12,6 +12,7 @@ To get started:
         git clone git@github.com:opencivicdata/anthropod.git && cd anthropod/
 
 3.  Add Larvae to dependencies
+
         #requirements.txt
         ...
         -e git+http://github.com/opencivicdata/larvae.git#egg=larvae
